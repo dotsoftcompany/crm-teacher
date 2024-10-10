@@ -141,20 +141,10 @@ function GroupCard({ card, setOpenDelete, setOpenEdit }) {
       <div className="flex items-center justify-between py-3 px-4 mt-4 border-t border-border">
         <div className="flex items-center gap-2 w-52">
           <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={
-                teachers.filter((item) => item.id === card.teacherId)[0]
-                  .fullName
-              }
-              alt={
-                teachers.filter((item) => item.id === card.teacherId)[0]
-                  .fullName
-              }
-            />
+            <AvatarImage src={teachers.fullName} alt={teachers.fullName} />
             <AvatarFallback className="text-xs">
-              {teachers
-                .filter((item) => item.id === card.teacherId)[0]
-                ?.fullName?.split(' ')
+              {teachers?.fullName
+                ?.split(' ')
                 .map((word) => word[0])
                 .join('')
                 .slice(0, 2)
@@ -162,7 +152,7 @@ function GroupCard({ card, setOpenDelete, setOpenEdit }) {
             </AvatarFallback>
           </Avatar>
           <span className="text-sm font-medium truncate">
-            {teachers.filter((item) => item.id === card.teacherId)[0].fullName}
+            {teachers.fullName}
           </span>
         </div>
         <small className="text-sm px-2 font-medium text-muted-foreground">

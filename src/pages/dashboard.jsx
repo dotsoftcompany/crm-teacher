@@ -15,6 +15,7 @@ import AddStudent from '@/pages/students/add-student';
 import Students from '@/pages/students/students';
 import PaymentHistory from '@/pages/payment-history';
 import Student from './students/student';
+import LessonsSchedule from '@/pages/lessons-schedule';
 
 function Dashboard() {
   return (
@@ -24,6 +25,7 @@ function Dashboard() {
           <Route path="/" element={<MainPage />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/add-course" element={<AddCourses />} />
+          <Route path="/lesson-schedule" element={<LessonsSchedule />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/teachers/:teacherId" element={<Teacher />} />
           <Route path="/add-teacher" element={<AddTeacher />} />

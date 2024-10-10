@@ -11,13 +11,19 @@ import GroupCard from '@/components/groups/card';
 import FilterGroups from '@/components/groups/filter';
 
 function Groups() {
-  const { groups, courses, teachers, students } = useMainContext();
+  const { groups, courses, teachers } = useMainContext();
   const [openGroupEditDialog, setOpenGroupEditDialog] = useState(false);
   const [openGroupDeleteDialog, setOpenGroupDeleteDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOption, setFilterOption] = useState('title');
 
-  const filteredGroups = groups.filter((group) => {
+  const teacherGroups = groups.filter(
+    (group) => group.teacherId === teachers.id
+  );
+
+  console.log(groups);
+
+  const filteredGroups = teacherGroups.filter((group) => {
     switch (filterOption) {
       case 'title':
         return courses
@@ -34,7 +40,7 @@ function Groups() {
     }
   });
 
-  console.log(students);
+  console.log();
 
   return (
     <div className="px-4 lg:px-8 mx-auto my-4 space-y-4">

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpDown, MoreHorizontal, ChevronDown } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal, ChevronDown, Eye } from 'lucide-react';
 
 import {
   flexRender,
@@ -97,6 +97,15 @@ export default function StudentsDataTable({
       ),
     },
     {
+      accessorKey: 'parentPhoneNumber',
+      header: 'Parents Phone',
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          {formatPhoneNumber(row.getValue('parentPhoneNumber'))}
+        </div>
+      ),
+    },
+    {
       accessorKey: 'address',
       header: 'Address',
       cell: ({ row }) => (
@@ -106,45 +115,17 @@ export default function StudentsDataTable({
       ),
     },
     {
-      accessorKey: 'isPay',
-      header: 'Payment Status',
+      accessorKey: 'view',
+      header: 'View',
       cell: ({ row }) => (
-        <div
-          className={
-            row.getValue('isPay')
-              ? 'text-green-500 whitespace-nowrap'
-              : 'text-red-500 whitespace-nowrap'
-          }
+        <Button
+          onClick={() => handleRowClick(row.original.id)}
+          variant="ghost"
+          className="h-8 w-8 p-0"
         >
-          {row.getValue('isPay') ? 'Paid' : 'Not Paid'}
-        </div>
+          <Eye className="h-4 w-4 cursor-pointer" />
+        </Button>
       ),
-    },
-    {
-      id: 'actions',
-      enableHiding: false,
-      cell: ({ row }) => {
-        const student = row.original;
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setOpenEdit(true)}>
-                Tahrirlash
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setOpenDelete(true)}>
-                O'chirish
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
     },
   ];
 
@@ -177,9 +158,9 @@ export default function StudentsDataTable({
         <div className="flex items-center py-2 gap-2">
           <Input
             placeholder="Filter Name..."
-            value={table.getColumn('name')?.getFilterValue() ?? ''}
+            value={table.getColumn('fullName')?.getFilterValue() ?? ''}
             onChange={(event) =>
-              table.getColumn('name')?.setFilterValue(event.target.value)
+              table.getColumn('fullName')?.setFilterValue(event.target.value)
             }
             className="w-full md:w-64 xl:w-72"
           />

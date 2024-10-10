@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { MapPin, Phone, Users } from 'lucide-react';
+import { MapPin, Phone, User, Users } from 'lucide-react';
 import { formatPhoneNumber } from '@/lib/utils';
 
 function StudentHeader({ student }) {

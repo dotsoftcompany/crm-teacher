@@ -100,12 +100,7 @@ const Group = () => {
             data={students}
             setOpenEdit={setOpenStudentEditDialog}
             setOpenDelete={setOpenStudentDeleteDialog}
-          >
-            <AddStudentDialog
-              openAddStudentDialog={openAddStudentDialog}
-              setOpenAddStudentDialog={setOpenAddStudentDialog}
-            />
-          </StudentsDataTable>
+          />
         </TabsContent>
         <TabsContent value="attendance_check">
           <div className="space-y-2 pt-2">

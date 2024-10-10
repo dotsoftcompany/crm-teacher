@@ -31,7 +31,7 @@ function MainPage() {
           <div className="flex items-center gap-2">
             <SheetMenu />
             <h2 className="text-2xl font-bold tracking-tight">
-              Hi, Welcome back 👋
+              {teachers.fullName}
             </h2>
           </div>
           <div className="hidden items-center space-x-2 md:flex">

@@ -64,12 +64,7 @@ function GroupHeader({ group }) {
         <div className="flex items-center gap-1">
           <User className="w-4 h-4" />
           <Link to={`/teachers/1`} className="inline-flex">
-            <span className="hover:underline">
-              {
-                teachers.filter((item) => item.id === group.teacherId)[0]
-                  .fullName
-              }
-            </span>
+            <span className="hover:underline">{teachers.fullName}</span>
           </Link>
         </div>
 
