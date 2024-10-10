@@ -2,6 +2,7 @@ import BreadcrumbComponent from '@/components/breadcrumb';
 import { useMainContext } from '@/context/main-context';
 import { ChevronRight } from 'lucide-react';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function LessonsSchedule() {
   const { groups, courses } = useMainContext();
@@ -88,34 +89,36 @@ function LessonsSchedule() {
                   times.indexOf(groupForDay.timeInDay.split(' - ')[0]);
 
                 return (
-                  <div
-                    key={day + time}
-                    className={`p-2 h-10 text-center font-semibold cursor-pointer ${getBackgroundColor(
-                      groupForDay.selectedDay
-                    )} ${isFirstTimeSlot ? 'rounded-t-md' : 'rounded-b-md'}`}
-                  >
-                    {isFirstTimeSlot ? (
-                      <>
-                        <div className="flex items-center justify-between rounded-t-md">
-                          <div className="flex items-center gap-1">
-                            <p className="text-sm">
-                              {
-                                courses.filter(
-                                  (item) => item.id === groupForDay.courseId
-                                )[0].courseTitle
-                              }
-                            </p>
-                            <small className="opacity-80">
-                              #{groupForDay.groupNumber}
-                            </small>
+                  <Link to={`/groups/${groupForDay.id}`}>
+                    <div
+                      key={day + time}
+                      className={`p-2 h-10 text-center font-semibold cursor-pointer ${getBackgroundColor(
+                        groupForDay.selectedDay
+                      )} ${isFirstTimeSlot ? 'rounded-t-md' : 'rounded-b-md'}`}
+                    >
+                      {isFirstTimeSlot ? (
+                        <>
+                          <div className="flex items-center justify-between rounded-t-md group">
+                            <div className="flex items-center gap-1">
+                              <p className="text-sm">
+                                {
+                                  courses.filter(
+                                    (item) => item.id === groupForDay.courseId
+                                  )[0].courseTitle
+                                }
+                              </p>
+                              <small className="opacity-80">
+                                #{groupForDay.groupNumber}
+                              </small>
+                            </div>
+                            <ChevronRight className="w-4 h-4 group-hover:mr-1 duration-200" />
                           </div>
-                          <ChevronRight className="w-4 h-4" />
-                        </div>
-                      </>
-                    ) : (
-                      <div></div>
-                    )}
-                  </div>
+                        </>
+                      ) : (
+                        <div></div>
+                      )}
+                    </div>
+                  </Link>
                 );
               }
 
