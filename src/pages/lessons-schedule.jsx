@@ -137,9 +137,4 @@ function LessonsSchedule() {
   );
 }
 
-const isTimeInRange = (time, range) => {
-  const [start, end] = range.split(' - ');
-  return time >= start && time < end;
-};
-
 export default LessonsSchedule;

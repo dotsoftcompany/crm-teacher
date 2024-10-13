@@ -1,3 +1,4 @@
+import { useMainContext } from '@/context/main-context';
 import {
   User,
   Users,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 
 export function getMenuList(pathname) {
+  const { groups, courses } = useMainContext();
   return [
     {
       groupLabel: '',
@@ -35,29 +37,20 @@ export function getMenuList(pathname) {
           submenus: [],
         },
         {
-          href: '/groups',
+          href: '',
           label: "Guruhlar ro'yxati",
           active: pathname.includes('/groups'),
-          icon: Users,
-          submenus: [],
-        },
-        {
-          href: '/students',
-          label: "O'quvchilar ro'yxati",
-          active: pathname.includes('/students'),
           icon: GraduationCapIcon,
-          submenus: [
-            {
-              href: '/students',
-              label: "O'quvchilar ro'yxati",
-              active: pathname === '/students',
-            },
-            {
-              href: '/add-student',
-              label: "O'quvchilar qo'shish",
-              active: pathname === '/add-student',
-            },
-          ],
+          submenus: groups.map((group) => ({
+            href: `/groups/${group.id}`, // Dynamic URL for each group
+            label:
+              courses.filter((item) => item.id === group.courseId)[0]
+                .courseTitle +
+              ' ' +
+              '#' +
+              group.groupNumber,
+            active: pathname === `/groups/${group.id}`,
+          })), // Map over the groups array to create submenus
         },
         {
           href: '/analytics',
