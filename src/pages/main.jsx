@@ -20,8 +20,15 @@ import { SheetMenu } from '@/components/layout/sheet-menu';
 import { MonthPicker } from '@/components/ui/month-picker';
 
 function MainPage() {
-  const { courses, teachers, students } = useMainContext();
+  const { groups, courses, teachers, students } = useMainContext();
   const [month, setMonth] = React.useState(null);
+
+  const totalStudents = groups.reduce((acc, group) => {
+    if (group.status && group.students) {
+      return acc + group.students.length;
+    }
+    return acc;
+  }, 0);
 
   // https://github.com/Kiranism/next-shadcn-dashboard-starter
   return (
@@ -46,7 +53,7 @@ function MainPage() {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{courses.length} ta</div>
+            <div className="text-2xl font-bold">{groups.length} ta</div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
             </p>
@@ -70,7 +77,7 @@ function MainPage() {
             <GraduationCapIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{students.length} ta</div>
+            <div className="text-2xl font-bold">{totalStudents} ta</div>
             <p className="text-xs text-muted-foreground">
               +19% from last month
             </p>
