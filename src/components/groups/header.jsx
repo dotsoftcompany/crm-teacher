@@ -63,9 +63,7 @@ function GroupHeader({ group }) {
 
         <div className="flex items-center gap-1">
           <User className="w-4 h-4" />
-          <Link to={`/teachers/1`} className="inline-flex">
-            <span className="hover:underline">{teachers.fullName}</span>
-          </Link>
+          <span className="">{teachers.fullName}</span>
         </div>
 
         <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">

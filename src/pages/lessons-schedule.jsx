@@ -16,6 +16,7 @@ function LessonsSchedule() {
     'Saturday',
     'Sunday',
   ];
+
   const times = Array.from({ length: 13 }, (_, i) => {
     const hour = 8 + i;
     return `${hour < 10 ? '0' : ''}${hour}:00`;

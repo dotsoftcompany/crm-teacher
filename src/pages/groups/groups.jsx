@@ -21,8 +21,6 @@ function Groups() {
     (group) => group.teacherId === teachers.id
   );
 
-  console.log(groups);
-
   const filteredGroups = teacherGroups.filter((group) => {
     switch (filterOption) {
       case 'title':

@@ -24,14 +24,18 @@ export function DatePicker({ className, setData, data }) {
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {data ? format(data, 'PPP') : <span>Pick a date</span>}
+          {data ? format(new Date(data), 'PPP') : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={data}
-          onSelect={setData}
+          selected={data ? new Date(data) : undefined}
+          onSelect={(selectedDate) => {
+            if (selectedDate) {
+              setData(selectedDate); // Ensure the selected date is passed to setData
+            }
+          }}
           initialFocus
         />
       </PopoverContent>
