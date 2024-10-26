@@ -37,6 +37,7 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.0",
+    "react-phone-number-input": "^3.4.9",
     "react-router-dom": "^6.26.2",
     "recharts": "^2.12.7"
   },

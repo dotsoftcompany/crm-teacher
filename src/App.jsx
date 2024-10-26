@@ -5,9 +5,9 @@ import Dashboard from '@/pages/dashboard';
 import Login from '@/pages/login';
 
 function App() {
-  const { teachers } = useMainContext();
+  const { teacher } = useMainContext();
 
-  if (false) {
+  if (!teacher) {
     return <Login />;
   }
 

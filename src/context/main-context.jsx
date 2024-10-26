@@ -1,6 +1,10 @@
 import { auth, db } from '@/api/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, onSnapshot } from 'firebase/firestore';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
+import { collection, doc, onSnapshot, query } from 'firebase/firestore';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const MainContext = createContext({});
@@ -11,33 +15,84 @@ export const useMainContext = () => {
 
 export const MainContextProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState([]);
   const [uid, setUid] = useState();
   const [courses, setCourses] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [groups, setGroups] = useState([]);
   const [students, setStudents] = useState([]);
 
-  console.log('teachers', teachers);
+  const [teacher, setTeacher] = useState([]);
+  const [teacherData, setTeacherData] = useState([]);
+  const [teacherId, setTeacherId] = useState();
+  const [managerData, setManagerData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const userId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3';
 
   useEffect(() => {
     setLoading(true);
-    const unsubscribe = onAuthStateChanged(auth, (res) => {
-      if (res) {
-        setUser(res);
-        setUid(auth.currentUser.uid);
+    const unsubscribe = onAuthStateChanged(auth, (teacher) => {
+      if (teacher) {
+        setTeacher(teacher);
+        setTeacherId(teacher.uid);
       } else {
-        setUser(null);
+        setTeacher(null);
+        setTeacherId(null);
       }
       setLoading(false);
     });
     return unsubscribe;
   }, []);
 
-  console.log(teachers);
+  // Fetch User Data from "teachers" Collection
 
-  const userId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3';
+  useEffect(() => {
+    if (teacherId) {
+      const fetchteacherData = async () => {
+        const userDocRef = doc(db, 'teachers', teacherId);
+
+        const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            setTeacherData({ ...docSnapshot.data(), id: docSnapshot.id });
+          } else {
+            console.warn('No matching document found with the provided ID.');
+          }
+        });
+
+        return unsubscribe;
+      };
+      fetchteacherData();
+    }
+  }, [teacherId]);
+
+  // Fetch Manager Data from "users" Collection
+  useEffect(() => {
+    const testDocId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3'; // Replace with a valid user ID from the 'users' collection for testing
+    const managerDocRef = doc(db, 'users', testDocId);
+
+    const unsubscribe = onSnapshot(managerDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        console.log('Test ManagerData found:', docSnapshot.data());
+      } else {
+        console.warn('No document found with the test ID.');
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Sign In Function
+  const signInUser = (email, password) => {
+    setLoading(true);
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Optionally, add any logic after login
+      })
+      .catch((error) => {
+        console.error('Login error:', error);
+      })
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
     const coursesCollection = collection(db, `users/${userId}/courses`);
@@ -82,10 +137,12 @@ export const MainContextProvider = ({ children }) => {
   }
 
   const contextValue = {
+    teacher,
+    teacherData,
+    signInUser,
     isOpen,
     setIsOpen,
-    user,
-    setUser,
+    setTeacher,
     logoutUser,
     courses,
     teachers,

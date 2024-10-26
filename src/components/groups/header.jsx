@@ -12,7 +12,7 @@ import { formatDate } from '@/lib/utils';
 import { Activity, Calendar, Clock, Phone, User } from 'lucide-react';
 
 function GroupHeader({ group }) {
-  const { teachers, courses } = useMainContext();
+  const { teacherData, courses } = useMainContext();
 
   return (
     <div className="space-y-2 py-4 w-full border-b border-border">
@@ -63,7 +63,7 @@ function GroupHeader({ group }) {
 
         <div className="flex items-center gap-1">
           <User className="w-4 h-4" />
-          <span className="">{teachers.fullName}</span>
+          <span className="">{teacherData.fullName}</span>
         </div>
 
         <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
