@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { collection, doc, onSnapshot, query } from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const MainContext = createContext({});
@@ -24,10 +24,37 @@ export const MainContextProvider = ({ children }) => {
   const [teacher, setTeacher] = useState([]);
   const [teacherData, setTeacherData] = useState([]);
   const [teacherId, setTeacherId] = useState();
-  const [managerData, setManagerData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const adminId = teacherData?.role;
+
+  useEffect(() => {
+    if (adminId && teacherId) {
+      const fetchTeacherGroupsData = async () => {
+        const groupsCollectionRef = collection(db, `users/${adminId}/groups`);
+        const groupsQuery = query(
+          groupsCollectionRef,
+          where('teacherId', '==', teacherId)
+        );
+
+        const unsubscribe = onSnapshot(groupsQuery, (snapshot) => {
+          const groupsArray = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          setGroups(groupsArray);
+        });
+
+        return unsubscribe;
+      };
+
+      fetchTeacherGroupsData();
+    }
+  }, [adminId, teacherId]);
+
   const userId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3';
+
+  console.log(groups);
 
   useEffect(() => {
     setLoading(true);
@@ -48,7 +75,7 @@ export const MainContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (teacherId) {
-      const fetchteacherData = async () => {
+      const fetchTeacherData = async () => {
         const userDocRef = doc(db, 'teachers', teacherId);
 
         const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
@@ -61,7 +88,7 @@ export const MainContextProvider = ({ children }) => {
 
         return unsubscribe;
       };
-      fetchteacherData();
+      fetchTeacherData();
     }
   }, [teacherId]);
 
@@ -110,10 +137,10 @@ export const MainContextProvider = ({ children }) => {
       }
     });
 
-    const groupsCollection = collection(db, `users/${userId}/groups`);
-    onSnapshot(groupsCollection, (snapshot) => {
-      setGroups(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    });
+    // const groupsCollection = collection(db, `users/${adminId}/groups`);
+    // onSnapshot(groupsCollection, (snapshot) => {
+    //   setGroups(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    // });
 
     const studentsCollection = collection(db, `users/${userId}/students`);
     onSnapshot(studentsCollection, (snapshot) => {

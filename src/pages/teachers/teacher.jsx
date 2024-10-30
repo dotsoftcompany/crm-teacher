@@ -60,16 +60,13 @@ const Teacher = () => {
         subtitle="John Doe"
       />
       <TeacherHeader teacher={teacher} />
-
       <EditDialog open={openGroupEditDialog} setOpen={setOpenGroupEditDialog}>
         <GroupEdit />
       </EditDialog>
-
       <DeleteAlert
         open={openGroupDeleteDialog}
         setOpen={setOpenGroupDeleteDialog}
       />
-
       <FilterGroups
         url="/add-teacher"
         title="Add teacher"
@@ -78,7 +75,6 @@ const Teacher = () => {
         filterOption={filterOption}
         setFilterOption={setFilterOption}
       />
-
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredGroups.map((card) => (
           <Link key={card.id} to={`/groups/${card.id}`}>
