@@ -39,11 +39,23 @@ import {
 } from '@/components/ui/tooltip';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/provider/ThemeProvider';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/api/firebase';
 
 export function Menu({ isOpen }) {
   const { setTheme } = useTheme();
   let location = useLocation();
   const menuList = getMenuList(location.pathname);
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log('Signed out successfully');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -190,7 +202,7 @@ export function Menu({ isOpen }) {
                   </DropdownMenuSub>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                   <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
