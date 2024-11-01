@@ -1,27 +1,37 @@
 import React from 'react';
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Link } from 'react-router-dom';
-import { useMainContext } from '@/context/main-context';
-import { formatDate } from '@/lib/utils';
-import {
-  Activity,
-  Calendar,
-  Clock,
-  Eclipse,
-  FlaskConical,
-  Phone,
-  User,
-} from 'lucide-react';
+import { Calendar } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-function ExamHeader({ exam }) {
-  const { teachers, courses } = useMainContext();
+function ExamHeader({ exam, loading }) {
+  if (loading) {
+    return (
+      <div className="space-y-2 py-4 w-full border-b border-border">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-6 w-1/3" />
+        </div>
 
+        <div className="flex items-center gap-3 md:gap-5">
+          <div className="flex items-center gap-1 text-xs md:text-sm">
+            <Skeleton className="w-2 h-2 rounded-full" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+          <div className="text-xs md:text-sm">
+            <Skeleton className="h-4 w-20" />
+          </div>
+
+          <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+            <Calendar className="w-4 h-4 text-muted-foreground" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+            <Calendar className="w-4 h-4 text-muted-foreground" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-2 py-4 w-full border-b border-border">
       <div className="flex items-center gap-2">
@@ -39,7 +49,7 @@ function ExamHeader({ exam }) {
               exam?.place === 'online' ? 'bg-green-500' : 'bg-yellow-500'
             }`}
           />
-          <span>{exam?.place}</span>
+          <span>{exam?.type}</span>
         </div>
         <div
           className={`capitalize ${
@@ -61,11 +71,11 @@ function ExamHeader({ exam }) {
 
         <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />
-          <span>{exam?.startDate}</span>
+          <span>{exam?.start}</span>
         </div>
         <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
           <Calendar className="w-4 h-4" />
-          <span>{exam?.endDate}</span>
+          <span>{exam?.end}</span>
         </div>
       </div>
     </div>

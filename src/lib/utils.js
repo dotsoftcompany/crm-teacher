@@ -59,3 +59,24 @@ export const formatDateNew = (date) => {
 
   return `${formattedDate} ${formattedTime}`;
 };
+
+
+export function formatDateTime(data) {
+  const {
+    year,
+    month,
+    day,
+    hour,
+    minute
+  } = data;
+
+  // Format each part to ensure two-digit format where needed
+  const formattedDay = String(day).padStart(2, '0');
+  const formattedMonth = String(month).padStart(2, '0');
+  const formattedYear = String(year);
+  const formattedHour = String(hour).padStart(2, '0');
+  const formattedMinute = String(minute).padStart(2, '0');
+
+  // Construct the formatted date string
+  return `${formattedDay}.${formattedMonth}.${formattedYear} - ${formattedHour}:${formattedMinute}`;
+}

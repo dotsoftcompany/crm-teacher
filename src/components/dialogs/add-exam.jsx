@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,22 +19,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { useToast } from '../ui/use-toast';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/api/firebase';
+import { I18nProvider } from 'react-aria';
+import DateTime from '../ui/date-time';
+import { useMainContext } from '@/context/main-context';
+import { formatDateTime } from '@/lib/utils';
 
-function AddExamDialog({ open, setOpen, groupId }) {
-  const userId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3';
+function AddExamDialog({ open, setOpen, groupId, fetchExams }) {
+  const { teacherData } = useMainContext();
+  const adminId = teacherData?.role;
+
   const { toast } = useToast();
 
   const defaultValues = {
     title: '',
-    startDate: '',
-    endDate: '',
+    start: '',
+    end: '',
     status: '',
-    place: '',
+    type: '',
   };
 
   const {
@@ -41,25 +47,36 @@ function AddExamDialog({ open, setOpen, groupId }) {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ defaultValues });
 
   const onSubmit = async (data) => {
     try {
       const userGroupsRef = collection(
         db,
-        `users/${userId}/groups/${groupId}/exams`
+        `users/${adminId}/groups/${groupId}/exams`
       );
 
-      await addDoc(userGroupsRef, data).then(() => {
-        reset();
-        setOpen(false);
-        toast({
-          title: "Imtixon muvaffaqiyat qo'shildi",
-        });
+      await addDoc(userGroupsRef, {
+        ...data,
+        start: formatDateTime(data.start),
+        end: formatDateTime(data.end),
+        timestamp: serverTimestamp(),
+      });
+
+      reset();
+      fetchExams();
+      setOpen(false);
+      toast({
+        title: 'Exam successfully added!',
       });
     } catch (error) {
-      console.log(error);
+      console.error('Error creating exam:', error);
+      toast({
+        title: 'Failed to create exam',
+        description: error.message,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -68,9 +85,10 @@ function AddExamDialog({ open, setOpen, groupId }) {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add Exam</DialogTitle>
+          <DialogDescription>Desc</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Title */}
           <div>
             <Label htmlFor="title">Title</Label>
@@ -82,85 +100,115 @@ function AddExamDialog({ open, setOpen, groupId }) {
             {errors.title && <p className="text-red-600">Title is required</p>}
           </div>
 
-          {/* Start Date */}
-          <div>
-            <Label htmlFor="startDate">Start Date</Label>
-            <Input
-              {...register('startDate', { required: true })}
-              id="startDate"
-              placeholder="01.12.2024 - 10AM"
-            />
-            {errors.startDate && (
-              <p className="text-red-600">Start Date is required</p>
-            )}
-          </div>
-
-          {/* End Date */}
-          <div>
-            <Label htmlFor="endDate">End Date</Label>
-            <Input
-              {...register('endDate', { required: true })}
-              id="endDate"
-              placeholder="02.12.2024 - 10PM"
-            />
-            {errors.endDate && (
-              <p className="text-red-600">End Date is required</p>
-            )}
-          </div>
-
-          {/* Place */}
-          <div>
-            <Label htmlFor="place">Place</Label>
-            <Controller
-              name="place"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Select
-                  onValueChange={(value) => field.onChange(value)}
-                  value={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select place" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="offline">Offline</SelectItem>
-                    <SelectItem value="online">Online</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="flex items-start gap-2">
+            <div className="w-full">
+              <Label id="start-date-label" htmlFor="start">
+                Start Date
+              </Label>
+              <Controller
+                name="start"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: "Bu yerni to'ldirish talab qilinadi",
+                }}
+                render={({ field }) => (
+                  <I18nProvider locale="ru-RU">
+                    <DateTime
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onChange={field.onChange}
+                      ariaLabelledby="start-date-label"
+                    />
+                  </I18nProvider>
+                )}
+              />
+              {errors.start && (
+                <p className="text-red-600">Start Date is required</p>
               )}
-            />
-            {errors.place && <p className="text-red-600">Place is required</p>}
+            </div>
+
+            <div className="w-full">
+              <Label id="end-date-label" htmlFor="end">
+                End Date
+              </Label>
+              <Controller
+                name="end"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: "Bu yerni to'ldirish talab qilinadi",
+                }}
+                render={({ field }) => (
+                  <I18nProvider locale="ru-RU">
+                    <DateTime
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onChange={field.onChange}
+                      ariaLabelledby="end-date-label"
+                    />
+                  </I18nProvider>
+                )}
+              />
+              {errors.end && (
+                <p className="text-red-600">End Date is required</p>
+              )}
+            </div>
           </div>
 
-          {/* Status */}
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <Controller
-              name="status"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Select
-                  onValueChange={(value) => field.onChange(value)}
-                  value={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ongoing">Ongoing</SelectItem>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                    <SelectItem value="paused">Paused</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="flex items-start gap-2">
+            <div className="w-full">
+              <Label htmlFor="type">type</Label>
+              <Controller
+                name="type"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <SelectTrigger aria-label="Select exam type">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="offline">Offline</SelectItem>
+                      <SelectItem value="online">Online</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.type && <p className="text-red-600">type is required</p>}
+            </div>
+
+            <div className="w-full">
+              <Label htmlFor="status">Status</Label>
+              <Controller
+                name="status"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <SelectTrigger aria-label="Select exam status">
+                      <SelectValue placeholder="Select Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ongoing">Ongoing</SelectItem>
+                      <SelectItem value="upcoming">Upcoming</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectItem value="paused">Paused</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.status && (
+                <p className="text-red-600">Status is required</p>
               )}
-            />
-            {errors.status && (
-              <p className="text-red-600">Status is required</p>
-            )}
+            </div>
           </div>
 
           {/* Submit Button */}

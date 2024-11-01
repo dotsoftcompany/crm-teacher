@@ -1,15 +1,27 @@
 import { db } from '@/api/firebase';
 import BreadcrumbComponent from '@/components/breadcrumb';
-import ExamHeader from '@/components/groups/exam-header';
+import AddQuestion from '@/components/groups/exam/add-question';
+import ExamHeader from '@/components/groups/exam/exam-header';
+import Questions from '@/components/groups/exam/questions';
 import GroupHeader from '@/components/groups/header';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { useMainContext } from '@/context/main-context';
-import { collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { PlusCircle, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
 const GroupExam = () => {
+  const { teacherData } = useMainContext();
+
+  const adminId = teacherData?.role;
   const { groupId, examId } = useParams();
-  const userId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3';
 
   const { groups, courses } = useMainContext();
   const group = groups.find((g) => g.id === groupId);
@@ -25,7 +37,7 @@ const GroupExam = () => {
       try {
         const examsRef = collection(
           db,
-          `users/${userId}/groups/${groupId}/exams`
+          `users/${adminId}/groups/${groupId}/exams`
         );
         const querySnapshot = await getDocs(examsRef);
 
@@ -43,7 +55,7 @@ const GroupExam = () => {
     };
 
     fetchExams();
-  }, [userId, groupId]);
+  }, [adminId, groupId]);
 
   if (!group) {
     return (
@@ -65,7 +77,20 @@ const GroupExam = () => {
           courses.filter((item) => item.id === group.courseId)[0].courseTitle
         } #${group.groupNumber}`}
       />
-      <ExamHeader exam={exam} />
+      <ExamHeader exam={exam} loading={loading} />
+
+      <Tabs defaultValue="questions" className="py-4">
+        <TabsList>
+          <TabsTrigger value="questions">Savollar</TabsTrigger>
+          <TabsTrigger value="add-question">Savol qo'shish</TabsTrigger>
+        </TabsList>
+        <TabsContent value="questions">
+          <Questions adminId={adminId} groupId={groupId} examId={examId} />
+        </TabsContent>
+        <TabsContent value="add-question">
+          <AddQuestion adminId={adminId} groupId={groupId} examId={examId} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

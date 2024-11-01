@@ -56,7 +56,7 @@ const CountrySelect = ({ disabled, value, onChange, options }) => {
         value={value || ''}
         onChange={handleSelect}
         className="absolute inset-0 text-sm opacity-0"
-        aria-label="Select country"
+        ariaLabel="Select country"
       >
         <option key="default" value="">
           Select a country

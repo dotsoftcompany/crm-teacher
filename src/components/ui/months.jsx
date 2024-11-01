@@ -56,7 +56,7 @@ export function Months({ currentMonth, onMonthChange }) {
             <div className="flex items-center space-x-1">
               <button
                 name="previous-year"
-                aria-label="Go to previous year"
+                ariaLabel="Go to previous year"
                 className={cn(
                   buttonVariants({ variant: 'outline' }),
                   'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
@@ -69,7 +69,7 @@ export function Months({ currentMonth, onMonthChange }) {
               </button>
               <button
                 name="next-year"
-                aria-label="Go to next year"
+                ariaLabel="Go to next year"
                 className={cn(
                   buttonVariants({ variant: 'outline' }),
                   'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
@@ -86,7 +86,7 @@ export function Months({ currentMonth, onMonthChange }) {
           <div
             className="grid w-full grid-cols-3 gap-2"
             role="grid"
-            aria-labelledby="month-picker"
+            ariaLabelledby="month-picker"
           >
             {months.map((month) => (
               <div

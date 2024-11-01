@@ -43,9 +43,6 @@ import {
 import { auth, db } from '@/api/firebase';
 import DeleteAlert from '@/components/dialogs/delete-alert';
 import AddExamDialog from '@/components/dialogs/add-exam';
-import DateTime from '@/components/ui/date-time';
-import { I18nProvider } from 'react-aria';
-import { formatDateNew } from '@/lib/utils';
 
 const Group = () => {
   const { groupId } = useParams();
@@ -64,7 +61,6 @@ const Group = () => {
   const [openAddExam, setOpenAddExam] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentGroupStudents, setCurrentGroupStudents] = useState([]);
-  let [date, setDate] = useState(null);
 
   const fetchGroupStudents = useCallback(async () => {
     setLoading(true);
@@ -103,34 +99,31 @@ const Group = () => {
   const [exams, setExams] = useState([]);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const examsRef = collection(
-          db,
-          `users/${userId}/groups/${groupId}/exams`
-        );
-        const querySnapshot = await getDocs(examsRef);
+  const fetchExams = async () => {
+    try {
+      const examsRef = collection(
+        db,
+        `users/${userId}/groups/${groupId}/exams`
+      );
+      const querySnapshot = await getDocs(examsRef);
 
-        const examsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      const examsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-        setExams(examsList);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchExams();
-  }, [userId, groupId]);
+      setExams(examsList);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchGroupStudents();
-  }, [groupId]);
+    fetchExams();
+  }, [userId, groupId]);
 
   if (!group) {
     return (
@@ -142,8 +135,6 @@ const Group = () => {
       </div>
     );
   }
-
-  console.log(date);
 
   return (
     <div className="px-4 lg:px-8 mt-4">
@@ -182,6 +173,7 @@ const Group = () => {
         open={openAddExam}
         setOpen={setOpenAddExam}
         groupId={groupId}
+        fetchExams={fetchExams}
       />
 
       <Tabs defaultValue="students" className="mt-4">
@@ -275,10 +267,6 @@ const Group = () => {
           </div>
         </TabsContent>
         <TabsContent value="exams">
-          <I18nProvider locale="ru-RU">
-            <DateTime label="Date" value={date} onChange={setDate} />
-            <p>Selected date: {formatDateNew(date)}</p>
-          </I18nProvider>
           <div className="space-y-2 pt-2">
             <div className="flex justify-between items-center">
               <Input placeholder="Imtihonni qidirish..." className="max-w-md" />
@@ -312,9 +300,9 @@ const Group = () => {
                   {exams.map((exam) => (
                     <TableRow>
                       <TableCell className="w-72 ">{exam?.title}</TableCell>
-                      <TableCell>{exam?.startDate}</TableCell>
-                      <TableCell>{exam?.endDate}</TableCell>
-                      <TableCell>{exam?.place}</TableCell>
+                      <TableCell>{exam?.start}</TableCell>
+                      <TableCell>{exam?.end}</TableCell>
+                      <TableCell>{exam?.type}</TableCell>
                       <TableCell>{exam?.status}</TableCell>
                       <TableCell className="rounded-br-lg text-center">
                         <Link to={`/groups/${groupId}/exam/${exam.id}`}>
