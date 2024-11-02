@@ -13,10 +13,8 @@ import DeleteAlert from '@/components/dialogs/delete-alert';
 import FilterGroups from '@/components/groups/filter';
 
 const Teacher = () => {
-  const { groups, courses, teachers } = useMainContext();
+  const { groups, courses, teacherData } = useMainContext();
   const { teacherId } = useParams();
-
-  const teacher = teachers.find((t) => t.id === teacherId);
 
   const [openGroupEditDialog, setOpenGroupEditDialog] = useState(false);
   const [openGroupDeleteDialog, setOpenGroupDeleteDialog] = useState(false);
@@ -41,7 +39,7 @@ const Teacher = () => {
     }
   });
 
-  if (!teacher) {
+  if (!teacherData) {
     return (
       <div className="px-4 lg:px-8 mx-auto py-4">
         <h2 className="text-2xl font-bold tracking-tight">404 error</h2>
@@ -59,7 +57,7 @@ const Teacher = () => {
         titleLink="/teachers"
         subtitle="John Doe"
       />
-      <TeacherHeader teacher={teacher} />
+      <TeacherHeader teacher={teacherData} />
       <EditDialog open={openGroupEditDialog} setOpen={setOpenGroupEditDialog}>
         <GroupEdit />
       </EditDialog>

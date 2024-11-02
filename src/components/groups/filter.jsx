@@ -54,15 +54,6 @@ function FilterGroups({
           </SelectContent>
         </Select>
       </div>
-      <Link to={url}>
-        <Button
-          variant="secondary"
-          className="hidden md:flex items-center gap-1.5 h-9 dark:bg-primary dark:text-black"
-        >
-          <PlusCircle className="w-4 h-4 -ml-1" />
-          <span>{title}</span>
-        </Button>
-      </Link>
     </div>
   );
 }

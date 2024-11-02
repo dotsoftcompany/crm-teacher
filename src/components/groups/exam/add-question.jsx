@@ -57,7 +57,7 @@ function AddQuestion({ adminId, groupId, examId }) {
           </Button>
         </div>
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-3">
+          <div key={field.id} className="space-y-3 mt-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label
@@ -69,6 +69,7 @@ function AddQuestion({ adminId, groupId, examId }) {
                 </Label>
                 {index > 0 && (
                   <button
+                    title="Remove question"
                     onClick={() => remove(index)}
                     className="text-red-500 p-2 rounded-md bg-accent"
                   >

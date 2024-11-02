@@ -30,7 +30,7 @@ function Dashboard() {
           <Route path="/lesson-schedule" element={<LessonsSchedule />} />
           <Route path="/settings/account" element={<Account />} />
           <Route path="/teachers" element={<Teachers />} />
-          <Route path="/teachers/:teacherId" element={<Teacher />} />
+          <Route path="/teacher/:teacherId" element={<Teacher />} />
           <Route path="/add-teacher" element={<AddTeacher />} />
           <Route path="/add-student" element={<AddStudent />} />
           <Route path="/students" element={<Students />} />

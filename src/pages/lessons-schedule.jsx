@@ -8,13 +8,13 @@ function LessonsSchedule() {
   const { groups, courses } = useMainContext();
 
   const days = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
+    'Dushanba',
+    'Seshanba',
+    'Chorshanba',
+    'Payshanba',
+    'Juma',
+    'Shanba',
+    'Yakshanba',
   ];
 
   const times = Array.from({ length: 13 }, (_, i) => {
@@ -22,15 +22,13 @@ function LessonsSchedule() {
     return `${hour < 10 ? '0' : ''}${hour}:00`;
   });
 
-  // Helper function to get the days based on selectedDay
   const getDaysForSchedule = (selectedDay) => {
-    if (selectedDay === 'odd') return ['Monday', 'Wednesday', 'Friday'];
-    if (selectedDay === 'even') return ['Tuesday', 'Thursday', 'Saturday'];
+    if (selectedDay === 'odd') return ['Dushanba', 'Chorshanba', 'Juma'];
+    if (selectedDay === 'even') return ['Seshanba', 'Payshanba', 'Shanba'];
     if (selectedDay === 'every_day') return days.slice(0, 6);
     return [];
   };
 
-  // Helper function to check if the current time is in the given range
   const isTimeInRange = (time, range) => {
     const [start, end] = range.split(' - ');
     const startHour = parseInt(start.split(':')[0], 10);
@@ -39,7 +37,6 @@ function LessonsSchedule() {
     return currentHour >= startHour && currentHour < endHour;
   };
 
-  // Helper function to assign background color based on selectedDay
   const getBackgroundColor = (selectedDay) => {
     if (selectedDay === 'odd') return 'bg-orange-200 dark:bg-orange-500';
     if (selectedDay === 'even') return 'bg-purple-200 dark:bg-purple-500';
@@ -95,7 +92,7 @@ function LessonsSchedule() {
                     <Link to={`/groups/${groupForDay.id}`}>
                       <div
                         key={day + time}
-                        className={`p-2 h-10 text-center font-semibold cursor-pointer ${getBackgroundColor(
+                        className={`relative p-2 h-10 text-center font-semibold cursor-pointer ${getBackgroundColor(
                           groupForDay.selectedDay
                         )} ${
                           isFirstTimeSlot
@@ -105,8 +102,8 @@ function LessonsSchedule() {
                       >
                         {isFirstTimeSlot ? (
                           <>
-                            <div className="flex flex-wrap items-center gap-1 rounded-t-sm md:rounded-t-md group">
-                              <p className="text-sm">
+                            <div className="absolute top-1/2 left-2 z-10 flex flex-wrap items-center gap-1 rounded-t-sm md:rounded-t-md group">
+                              <p className="text-xs leading-3">
                                 {
                                   courses.filter(
                                     (item) => item.id === groupForDay.courseId
@@ -116,7 +113,7 @@ function LessonsSchedule() {
                               <small className="opacity-80">
                                 #{groupForDay.groupNumber}
                               </small>
-                              <ChevronRight className="w-4 h-4 group-hover:ml-1 duration-200" />
+                              <ChevronRight className="w-3 h-3 group-hover:ml-1 duration-200" />
                             </div>
                           </>
                         ) : (

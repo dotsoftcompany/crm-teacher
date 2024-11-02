@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Eye } from 'lucide-react';
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 
 import { useMainContext } from '@/context/main-context';
+import { db } from '@/api/firebase';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -19,37 +29,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 import StudentsDataTable from '@/components/students/data-table';
 import GroupHeader from '@/components/groups/header';
-import AddStudentDialog from '@/components/dialogs/add-student';
 import BreadcrumbComponent from '@/components/breadcrumb';
 import EditDialog from '@/components/dialogs/edit-dialog';
 import StudentEdit from '@/components/students/edit';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
 import AddAbsenteeDialog from '@/components/dialogs/add-absentee';
 import ListAbsenteeDialog from '@/components/dialogs/list-absentee';
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  updateDoc,
-} from 'firebase/firestore';
-import { auth, db } from '@/api/firebase';
 import DeleteAlert from '@/components/dialogs/delete-alert';
 import AddExamDialog from '@/components/dialogs/add-exam';
 
 const Group = () => {
   const { groupId } = useParams();
 
-  const userId = '9qS2pojPEhf7JOCZNUb4Cvwev6C3';
-
-  const { groups, courses } = useMainContext();
+  const { groups, courses, adminId } = useMainContext();
   const group = groups.find((g) => g.id === groupId);
 
   const [openStudentEditDialog, setOpenStudentEditDialog] = useState(false);
@@ -66,7 +62,7 @@ const Group = () => {
     setLoading(true);
 
     try {
-      const groupRef = doc(db, `users/${userId}/groups`, groupId);
+      const groupRef = doc(db, `users/${adminId}/groups`, groupId);
       const groupSnap = await getDoc(groupRef);
 
       if (groupSnap.exists()) {
@@ -75,7 +71,7 @@ const Group = () => {
         setCurrentGroupStudents(studentIds);
 
         if (studentIds.length > 0) {
-          const studentsRef = collection(db, `users/${userId}/students`);
+          const studentsRef = collection(db, `users/${adminId}/students`);
           const q = query(studentsRef, where('__name__', 'in', studentIds));
 
           const querySnapshot = await getDocs(q);
@@ -103,7 +99,7 @@ const Group = () => {
     try {
       const examsRef = collection(
         db,
-        `users/${userId}/groups/${groupId}/exams`
+        `users/${adminId}/groups/${groupId}/exams`
       );
       const querySnapshot = await getDocs(examsRef);
 
@@ -123,7 +119,7 @@ const Group = () => {
   useEffect(() => {
     fetchGroupStudents();
     fetchExams();
-  }, [userId, groupId]);
+  }, [adminId, groupId]);
 
   if (!group) {
     return (

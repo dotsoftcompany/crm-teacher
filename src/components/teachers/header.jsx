@@ -7,8 +7,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Calendar, CalendarPlus, MapPin, Users } from 'lucide-react';
-import { formatDate, formatPhoneNumber } from '@/lib/utils';
+import {
+  Calendar,
+  CalendarPlus,
+  Code,
+  Key,
+  KeyRound,
+  MapPin,
+  User,
+  Users,
+} from 'lucide-react';
+import { formatPhoneNumber } from '@/lib/utils';
 
 function TeacherHeader({ teacher }) {
   return (
@@ -28,14 +37,12 @@ function TeacherHeader({ teacher }) {
           <Tooltip>
             <TooltipTrigger>
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <p className="text-sm md:text-base">
-                  {formatDate(teacher.dateOfBirth)}
-                </p>
+                <User className="h-4 w-4" />
+                <p className="text-sm md:text-base">{teacher.email}</p>
               </div>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <small className="text-xs">Tug'ulgan yil</small>
+              <small className="text-xs">username</small>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -43,10 +50,8 @@ function TeacherHeader({ teacher }) {
           <Tooltip>
             <TooltipTrigger>
               <div className="flex items-center gap-2">
-                <CalendarPlus className="h-4 w-4" />
-                <p className="text-sm md:text-base">
-                  {formatDate(teacher.dateOfJoining)}
-                </p>
+                <KeyRound className="h-4 w-4" />
+                <p className="text-sm md:text-base">{teacher.password}</p>
               </div>
             </TooltipTrigger>
             <TooltipContent side="top">

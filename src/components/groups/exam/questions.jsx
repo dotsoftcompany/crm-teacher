@@ -11,34 +11,41 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import EditDialog from '@/components/dialogs/edit-dialog';
+import DeleteAlert from '@/components/dialogs/delete-alert';
+import QuestionEdit from './questionEdit';
 
 function Questions({ adminId, groupId, examId }) {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [id, setId] = useState('');
+  const options = ['A', 'B', 'C', 'D'];
+
+  const fetchQuestions = async () => {
+    try {
+      const questionsRef = collection(
+        db,
+        `users/${adminId}/groups/${groupId}/exams/${examId}/questions`
+      );
+      const querySnapshot = await getDocs(questionsRef);
+
+      const questionsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setQuestions(questionsList);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const questionsRef = collection(
-          db,
-          `users/${adminId}/groups/${groupId}/exams/${examId}/questions`
-        );
-        const querySnapshot = await getDocs(questionsRef);
-
-        const questionsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setQuestions(questionsList);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchQuestions();
   }, [adminId, groupId, examId]);
 
@@ -72,10 +79,36 @@ function Questions({ adminId, groupId, examId }) {
 
   if (error) return <p>Error fetching questions: {error}</p>;
 
-  const options = ['A', 'B', 'C', 'D'];
-
   return (
     <div>
+      <EditDialog open={openEdit} setOpen={setOpenEdit}>
+        <QuestionEdit
+          questions={questions}
+          ids={{
+            adminId: adminId,
+            groupId: groupId,
+            examId: examId,
+            questionId: id,
+          }}
+          fetchQuestions={fetchQuestions}
+          setOpen={setOpenEdit}
+        />
+      </EditDialog>
+
+      <DeleteAlert
+        id={id}
+        collection={`users/${adminId}/groups/${groupId}/exams/${examId}/questions`}
+        fetchQuestions={fetchQuestions}
+        open={openDelete}
+        setOpen={setOpenDelete}
+      />
+
+      {!questions.length && (
+        <p className="text-center text-muted-foreground my-10">
+          Hali savol qo'shilmagan
+        </p>
+      )}
+
       <ul className="w-full">
         {questions.map((question) => (
           <li className="w-full">
@@ -107,11 +140,25 @@ function Questions({ adminId, groupId, examId }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[160px]">
-                  <DropdownMenuItem onClick={(e) => {}}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenEdit(true);
+                      setId(question.id);
+                      document.body.style.pointerEvents = '';
+                    }}
+                  >
                     Tahrirlash
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={(e) => {}}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenDelete(true);
+                      setId(question.id);
+                      document.body.style.pointerEvents = '';
+                    }}
+                  >
                     O'chirish
                     <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
                   </DropdownMenuItem>

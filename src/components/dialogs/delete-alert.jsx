@@ -9,8 +9,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import useDelete from '@/hooks/useDelete';
+import { Loader } from 'lucide-react';
 
-function DeleteAlert({ open, setOpen }) {
+function DeleteAlert({ id, collection, fetchQuestions, open, setOpen }) {
+  const { deleteItem, loading, error } = useDelete(
+    id,
+    collection,
+    fetchQuestions
+  );
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>
@@ -24,7 +31,15 @@ function DeleteAlert({ open, setOpen }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
-          <AlertDialogAction>O'chirish</AlertDialogAction>
+          <AlertDialogAction
+            className="flex items-center gap-1"
+            onClick={() => {
+              deleteItem(id);
+            }}
+          >
+            {loading && <Loader className="w-4 h-4 animate-spin" />}
+            O'chirish
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

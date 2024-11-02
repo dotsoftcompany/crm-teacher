@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export function getMenuList(pathname) {
-  const { groups, courses } = useMainContext();
+  const { groups, courses, teacherData } = useMainContext();
   return [
     {
       groupLabel: '',
@@ -42,21 +42,33 @@ export function getMenuList(pathname) {
           active: pathname.includes('/groups'),
           icon: GraduationCapIcon,
           submenus: groups.map((group) => ({
-            href: `/groups/${group.id}`, // Dynamic URL for each group
+            href: `/groups/${group.id}`,
             label:
               courses.filter((item) => item.id === group.courseId)[0]
-                .courseTitle +
+                ?.courseTitle +
               ' ' +
               '#' +
               group.groupNumber,
             active: pathname === `/groups/${group.id}`,
-          })), // Map over the groups array to create submenus
+          })),
         },
         {
           href: '/analytics',
           label: 'Hisobotlar',
-          active: pathname.includes('/analytics'),
+        active: pathname.includes('/analytics'),
           icon: ChartPie,
+          submenus: [],
+        },
+      ],
+    },
+    {
+      groupLabel: '',
+      menus: [
+        {
+          href: `/teacher/${teacherData.id}`,
+          label: 'Profile',
+          active: pathname === `/teacher/${teacherData.id}`,
+          icon: UserRoundPen,
           submenus: [],
         },
       ],
