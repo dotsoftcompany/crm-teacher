@@ -19,6 +19,7 @@ export const MainContextProvider = ({ children }) => {
   const [teachers, setTeachers] = useState([]);
   const [groups, setGroups] = useState([]);
   const [students, setStudents] = useState([]);
+  const [groupStudents, setGroupStudents] = useState([]);
   const [teacher, setTeacher] = useState([]);
   const [teacherData, setTeacherData] = useState([]);
   const [teacherId, setTeacherId] = useState();
@@ -73,12 +74,13 @@ export const MainContextProvider = ({ children }) => {
   useEffect(() => {
     if (adminId) {
       const fetchTeacherStudentsData = async () => {
-        const studentsCollectionRef = collection(
-          db,
-          `users/${adminId}/students`
+        const studentsCollectionRef = collection(db, `students`);
+        const studentsQuery = query(
+          studentsCollectionRef,
+          where('adminId', '==', adminId)
         );
 
-        const unsubscribe = onSnapshot(studentsCollectionRef, (snapshot) => {
+        const unsubscribe = onSnapshot(studentsQuery, (snapshot) => {
           const studentsArray = snapshot.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
@@ -155,6 +157,8 @@ export const MainContextProvider = ({ children }) => {
     setTeachers,
     groups,
     students,
+    groupStudents,
+    setGroupStudents,
   };
 
   return (

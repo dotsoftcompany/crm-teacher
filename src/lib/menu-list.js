@@ -55,24 +55,24 @@ export function getMenuList(pathname) {
         {
           href: '/analytics',
           label: 'Hisobotlar',
-        active: pathname.includes('/analytics'),
+          active: pathname.includes('/analytics'),
           icon: ChartPie,
           submenus: [],
         },
       ],
     },
-    {
-      groupLabel: '',
-      menus: [
-        {
-          href: `/teacher/${teacherData.id}`,
-          label: 'Profile',
-          active: pathname === `/teacher/${teacherData.id}`,
-          icon: UserRoundPen,
-          submenus: [],
-        },
-      ],
-    },
+    // {
+    //   groupLabel: '',
+    //   menus: [
+    //     {
+    //       href: `/teacher/${teacherData.id}`,
+    //       label: 'Profile',
+    //       active: pathname === `/teacher/${teacherData.id}`,
+    //       icon: UserRoundPen,
+    //       submenus: [],
+    //     },
+    //   ],
+    // },
     {
       groupLabel: 'Account',
       menus: [

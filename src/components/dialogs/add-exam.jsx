@@ -27,6 +27,7 @@ import { I18nProvider } from 'react-aria';
 import DateTime from '../ui/date-time';
 import { useMainContext } from '@/context/main-context';
 import { formatDateTime } from '@/lib/utils';
+import { Checkbox } from '../ui/checkbox';
 
 function AddExamDialog({ open, setOpen, groupId, fetchExams }) {
   const { teacherData } = useMainContext();
@@ -40,6 +41,7 @@ function AddExamDialog({ open, setOpen, groupId, fetchExams }) {
     end: '',
     status: '',
     type: '',
+    isTest: true,
   };
 
   const {
@@ -61,6 +63,7 @@ function AddExamDialog({ open, setOpen, groupId, fetchExams }) {
         ...data,
         start: formatDateTime(data.start),
         end: formatDateTime(data.end),
+        isShow: false,
         timestamp: serverTimestamp(),
       });
 
@@ -209,6 +212,21 @@ function AddExamDialog({ open, setOpen, groupId, fetchExams }) {
                 <p className="text-red-600">Status is required</p>
               )}
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2 py-2.5 px-3 rounded-lg border border-border">
+            <Controller
+              name="isTest"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  checked={value}
+                  onCheckedChange={onChange}
+                  id="isTest"
+                />
+              )}
+            />
+            <Label htmlFor="isTest">Imtixon test shaklda</Label>
           </div>
 
           {/* Submit Button */}

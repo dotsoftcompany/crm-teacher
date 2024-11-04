@@ -41,6 +41,7 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '@/provider/ThemeProvider';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/api/firebase';
+import { useEffect } from 'react';
 
 export function Menu({ isOpen }) {
   const { setTheme } = useTheme();
@@ -56,6 +57,33 @@ export function Menu({ isOpen }) {
         console.error(error);
       });
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === 'd') {
+        event.preventDefault();
+        setTheme('dark');
+      }
+      if (event.ctrlKey && event.key === 'f') {
+        event.preventDefault();
+        setTheme('light');
+      }
+      if (event.ctrlKey && event.key === 'g') {
+        event.preventDefault();
+        setTheme('system');
+      }
+      if (event.ctrlKey && event.key === 'q') {
+        event.preventDefault();
+        setOpenAlert(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -173,29 +201,32 @@ export function Menu({ isOpen }) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  {/* <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                     <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                       <SunMoon className="mr-2 h-4 w-4" />
                       <span>Theme</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
-                      <DropdownMenuSubContent>
+                      <DropdownMenuSubContent className="w-40">
                         <DropdownMenuItem onClick={() => setTheme('light')}>
                           <Sun className="mr-2 h-4 w-4" />
-                          <span>Light</span>
+                          <span>Kunduzgi</span>
+                          <DropdownMenuShortcut>⌘F</DropdownMenuShortcut>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setTheme('dark')}>
                           <Moon className="mr-2 h-4 w-4" />
-                          <span>Dark</span>
+                          <span>Tungi</span>
+                          <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setTheme('system')}>
                           <Monitor className="mr-2 h-4 w-4" />
-                          <span>System</span>
+                          <span>Sistema</span>
+                          <DropdownMenuShortcut>⌘G</DropdownMenuShortcut>
                         </DropdownMenuItem>
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>

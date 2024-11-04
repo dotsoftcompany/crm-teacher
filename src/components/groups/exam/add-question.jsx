@@ -46,7 +46,6 @@ function AddQuestion({ adminId, groupId, examId }) {
 
   const watchQuestions = watch('questions');
 
-  console.log(watchQuestions);
   return (
     <div className="relative">
       <form onSubmit={handleSubmit(onSubmit)} className="w-full">

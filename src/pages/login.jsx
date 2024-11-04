@@ -1,23 +1,23 @@
-import { auth } from '@/api/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMainContext } from '@/context/main-context';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
 export const description =
   "A login page with two columns. The first column has the login form with email and password. There's a Forgot your password link and a link to sign up if you do not have an account. The second column has a cover image.";
 
-export const containerClassName = 'w-full h-full p-4 lg:p-0';
+export const containerClassName = 'w-full h-full p-4 xl:p-0';
 
 function Login() {
-  const { teachers, signInUser } = useMainContext();
+  const { signInUser } = useMainContext();
   const [data, setData] = useState({
     username: '',
     password: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible((prevState) => !prevState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -34,7 +34,7 @@ function Login() {
     const password = data.password;
 
     if (!email || !password) {
-      setError('Please fill in both fields.');
+      setError('Username yoki password kiritilmagan.');
       return;
     }
 
@@ -50,59 +50,68 @@ function Login() {
   };
 
   return (
-    <div className="w-full lg:grid lg:grid-cols-2 h-screen">
-      <div className="flex items-center justify-center py-12">
+    <div className="w-full xl:grid xl:grid-cols-3 h-screen overflow-hidden">
+      <div className="flex items-center justify-center h-screen xl:h-auto xl:py-12">
         <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
-            <p className="text-muted-foreground">
-              Enter your username and password below to login to your account.
-            </p>
-          </div>
-          {error && <p className="text-red-500">{error}</p>}
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                required
-                value={data.username}
-                onChange={handleChange}
-                name="username"
-              />
+              <Label required htmlFor="username">
+                Username
+              </Label>
+              <div className="relative">
+                <Input
+                  className="peer pe-12 pr-24"
+                  type="text"
+                  id="username"
+                  required
+                  value={data.username}
+                  onChange={handleChange}
+                  name="username"
+                  placeholder="johndoe"
+                />
+                <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-sm bg-background my-0.5 mr-0.5 rounded-r-md text-muted-foreground peer-disabled:opacity-50">
+                  @teacher.uz
+                </span>
+              </div>
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+              <Label required htmlFor="password">
+                Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={isVisible ? 'text' : 'password'}
+                  required
+                  value={data.password}
+                  onChange={handleChange}
+                  name="password"
+                  placeholder="***********"
+                />
                 <button
+                  className="absolute inset-y-px end-px flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 transition-shadow hover:text-foreground focus-visible:border focus-visible:border-ring focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="text-sm text-blue-600 hover:underline"
+                  onClick={toggleVisibility}
                 >
-                  {showPassword ? 'Hide' : 'Show'} Password
+                  {isVisible ? (
+                    <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
+                  ) : (
+                    <Eye size={16} strokeWidth={2} aria-hidden="true" />
+                  )}
                 </button>
               </div>
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={data.password}
-                onChange={handleChange}
-                name="password"
-              />
             </div>
+            {error && <small className="text-red-500">{error}</small>}
             <Button className="w-full" onClick={signIn} disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </Button>
           </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block">
+      <div className="hidden bg-muted xl:block col-span-2">
         <img
-          src="/vite.svg"
-          alt="Cover Image"
+          src="https://firebasestorage.googleapis.com/v0/b/crm-system-4fefe.appspot.com/o/cover%2Fcrm-cover.png?alt=media&token=611e8787-6118-454e-aa02-1372d844fe7e"
+          alt="Image"
           className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>

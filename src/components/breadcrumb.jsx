@@ -11,11 +11,17 @@ import {
 } from '@/components/ui/breadcrumb';
 import { SheetMenu } from './layout/sheet-menu';
 
-function BreadcrumbComponent({ title, titleLink = null, subtitle }) {
+function BreadcrumbComponent({
+  title,
+  titleLink = null,
+  subtitle,
+  subtitleLink = null,
+  subtitle2,
+}) {
   return (
     <div className="flex items-center gap-2">
       <SheetMenu />
-      <Breadcrumb>
+      <Breadcrumb className="overflow-x-auto whitespace-nowrap w-full">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Asosiy</BreadcrumbLink>
@@ -33,7 +39,20 @@ function BreadcrumbComponent({ title, titleLink = null, subtitle }) {
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{subtitle}</BreadcrumbPage>
+                <Link
+                  to={subtitle2 ? subtitleLink : null}
+                  className={subtitle ? 'cursor-pointer' : 'cursor-text'}
+                >
+                  <BreadcrumbLink>{subtitle}</BreadcrumbLink>
+                </Link>
+              </BreadcrumbItem>
+            </>
+          )}
+          {subtitle2 && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink>{subtitle2}</BreadcrumbLink>
               </BreadcrumbItem>
             </>
           )}
