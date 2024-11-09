@@ -11,7 +11,7 @@ import GroupCard from '@/components/groups/card';
 import FilterGroups from '@/components/groups/filter';
 
 function Groups() {
-  const { groups, courses, teachers } = useMainContext();
+  const { groups, courses, teachers, teacherId } = useMainContext();
   const [openGroupEditDialog, setOpenGroupEditDialog] = useState(false);
   const [openGroupDeleteDialog, setOpenGroupDeleteDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +71,10 @@ function Groups() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredGroups.map((card) => (
-          <Link key={card.id} to={`/groups/${card.id}`}>
+          <Link
+            key={card.id}
+            to={card.teacherId === teacherId ? `/groups/${card.id}` : null}
+          >
             <GroupCard
               card={card}
               setOpenDelete={setOpenGroupDeleteDialog}

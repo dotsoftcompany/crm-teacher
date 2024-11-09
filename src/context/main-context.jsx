@@ -147,6 +147,7 @@ export const MainContextProvider = ({ children }) => {
     adminId,
     teacher,
     teacherData,
+    teacherId,
     signInUser,
     isOpen,
     setIsOpen,

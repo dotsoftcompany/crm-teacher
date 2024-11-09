@@ -60,15 +60,8 @@ export const formatDateNew = (date) => {
   return `${formattedDate} ${formattedTime}`;
 };
 
-
 export function formatDateTime(data) {
-  const {
-    year,
-    month,
-    day,
-    hour,
-    minute
-  } = data;
+  const { year, month, day, hour, minute } = data;
 
   // Format each part to ensure two-digit format where needed
   const formattedDay = String(day).padStart(2, '0');
@@ -80,3 +73,17 @@ export function formatDateTime(data) {
   // Construct the formatted date string
   return `${formattedDay}.${formattedMonth}.${formattedYear} - ${formattedHour}:${formattedMinute}`;
 }
+
+export const scoreColor = (studentScore) => {
+  return studentScore === 5
+    ? 'bg-green-200 dark:bg-green-500'
+    : studentScore === 4
+    ? 'bg-blue-200 dark:bg-blue-500'
+    : studentScore === 3
+    ? 'bg-yellow-200 dark:bg-yellow-500'
+    : studentScore === 2
+    ? 'bg-purple-200 dark:bg-purple-500'
+    : studentScore === 1
+    ? 'bg-red-200 dark:bg-red-500'
+    : 'bg-white dark:bg-muted';
+};
