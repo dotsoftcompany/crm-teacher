@@ -55,6 +55,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { scoreColor } from '@/lib/utils';
 import AddEvaluation from '@/components/dialogs/add-evaluation';
 import { format } from 'date-fns';
+import Evaluation from '@/components/groups/evaluation/evaluation';
 
 const Group = () => {
   const { groupId } = useParams();
@@ -139,29 +140,6 @@ const Group = () => {
       setLoading(false);
     }
   };
-
-  const [evaluations, setEvaluations] = useState([]);
-
-  const fetchEvaluations = async () => {
-    try {
-      const evaluationsRef = collection(
-        db,
-        `users/${adminId}/groups/${groupId}/evaluations`
-      );
-      const querySnapshot = await getDocs(evaluationsRef);
-
-      const evaluationsList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setEvaluations(evaluationsList);
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
-    }
-  };
-
   const toggleIsShow = useCallback(
     async (examId, currentIsShow) => {
       setDisabled((prev) => ({ ...prev, [examId]: true }));
@@ -195,7 +173,6 @@ const Group = () => {
 
   useEffect(() => {
     fetchExams();
-    fetchEvaluations();
   }, [adminId, groupId]);
 
   useEffect(() => {
@@ -218,9 +195,6 @@ const Group = () => {
       clearTimeout(debounceRef.current);
     };
   }, [searchTerm, exams]);
-  const sortedEvaluations = evaluations.sort(
-    (a, b) => a.timestamp.seconds - b.timestamp.seconds
-  );
 
   if (!group) {
     return (
@@ -270,14 +244,6 @@ const Group = () => {
         setOpen={setOpenAddExam}
         groupId={groupId}
         fetchExams={fetchExams}
-      />
-
-      <AddEvaluation
-        open={openAddEvaluation}
-        setOpen={setOpenAddEvaluation}
-        groupId={groupId}
-        groupStudents={groupStudents}
-        fetch={fetchEvaluations}
       />
 
       <Tabs defaultValue="students" className="mt-4">
@@ -375,136 +341,7 @@ const Group = () => {
         </TabsContent>
         <TabsContent value="tasks">tasks</TabsContent>
         <TabsContent value="evaluation">
-          <div className="space-y-2 pt-2">
-            <div className="flex justify-between items-center">
-              <div className="relative">
-                <Input
-                  className="peer pe-9 ps-9 w-full lg:w-96"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Oquvchini qidirish..."
-                  type="search"
-                />
-                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
-                  <Search size={16} strokeWidth={2} />
-                </div>
-              </div>
-              <Button
-                onClick={() => setOpenAddEvaluation(true)}
-                variant="secondary"
-                className="dark:bg-white dark:text-black"
-              >
-                Baholash
-              </Button>
-            </div>
-
-            <div className="overflow-x-auto rounded-lg">
-              <div className="inline-flex border border-border rounded-lg min-w-fit">
-                <div className="flex-shrink-0 w-44 md:w-52 !sticky left-0 bg-muted dark:bg-background z-10 shadow">
-                  <div className="font-medium text-sm p-4 border-b border-border">
-                    Student's Name
-                  </div>
-                  {groupStudents.map((student) => (
-                    <div
-                      key={student.id}
-                      className="p-4 text-sm border-b border-border whitespace-nowrap truncate bg-muted dark:bg-background"
-                    >
-                      {student.fullName}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex overflow-x-auto rounded-r-lg">
-                  {sortedEvaluations.map((evaluation) => {
-                    function formatDate(timestamp) {
-                      const { seconds, nanoseconds } = timestamp;
-                      const date = new Date(
-                        seconds * 1000 + nanoseconds / 1000000
-                      );
-                      return format(date, 'dd.MM.yy');
-                    }
-                    return (
-                      <div key={evaluation.id} className="flex-shrink-0 group">
-                        <div className="relative p-4 border-l border-border border-b bg-muted dark:bg-background">
-                          <span className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground font-medium group-hover:invisible">
-                            {formatDate(evaluation.timestamp)}
-                          </span>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger
-                              className="invisible group-hover:visible"
-                              asChild
-                              aria-hidden="true"
-                            >
-                              <Button
-                                variant="ghost"
-                                className="flex h-[1.25rem] w-8 p-0 data-[state=open]:bg-muted rounded-sm"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2}
-                                  stroke="currentColor"
-                                  className="h-5 w-5"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                                  />
-                                </svg>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="w-[160px]"
-                            >
-                              <DropdownMenuItem
-                                className="!text-sm"
-                                onSelect={() => {
-                                  // setOpenEdit(true);
-                                  document.body.style.pointerEvents = '';
-                                }}
-                              >
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="!text-sm"
-                                onSelect={() => {
-                                  // setOpenDelete(true);
-                                  document.body.style.pointerEvents = '';
-                                }}
-                              >
-                                Delete
-                                <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-
-                        {/* Student Scores */}
-                        {groupStudents.map((student) => {
-                          const studentScore =
-                            evaluation.students.find((s) => s.id === student.id)
-                              ?.score || '-';
-
-                          return (
-                            <div
-                              key={student.id}
-                              className={`flex items-center text-sm justify-center p-4 border-l border-b border-border font-bold`}
-                            >
-                              {studentScore}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
+          <Evaluation groupId={groupId} students={groupStudents} />
         </TabsContent>
         <TabsContent value="exams">
           <div className="space-y-2 pt-2">

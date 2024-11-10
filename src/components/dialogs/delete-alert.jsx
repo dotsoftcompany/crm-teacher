@@ -12,12 +12,8 @@ import {
 import useDelete from '@/hooks/useDelete';
 import { Loader } from 'lucide-react';
 
-function DeleteAlert({ id, collection, fetchQuestions, open, setOpen }) {
-  const { deleteItem, loading, error } = useDelete(
-    id,
-    collection,
-    fetchQuestions
-  );
+function DeleteAlert({ id, collection, fetch, open, setOpen }) {
+  const { deleteItem, loading, error } = useDelete(id, collection, fetch);
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent>

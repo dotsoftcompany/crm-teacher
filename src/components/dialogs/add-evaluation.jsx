@@ -21,6 +21,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/api/firebase';
 import { useMainContext } from '@/context/main-context';
 import { Loader, Search } from 'lucide-react';
+import { ScrollArea } from '../ui/scroll-area';
 
 function AddEvaluation({ open, setOpen, groupId, groupStudents, fetch }) {
   const { teacherData } = useMainContext();
@@ -144,67 +145,70 @@ function AddEvaluation({ open, setOpen, groupId, groupStudents, fetch }) {
             />
           </div>
 
-          {filteredStudents.map((student, index) => (
-            <div
-              key={student.id}
-              className="grid grid-cols-1 lg:grid-cols-3 items-start gap-2 w-full"
-            >
-              <input type="hidden" {...register(`students.${index}.id`)} />
+          <ScrollArea className="h-[300px] w-full">
+            {filteredStudents.map((student, index) => (
+              <div
+                key={student.id}
+                className="grid grid-cols-1 lg:grid-cols-3 items-start gap-2 w-full"
+              >
+                <input type="hidden" {...register(`students.${index}.id`)} />
 
-              <div className="space-y-1">
-                <Label>Ism familiya</Label>
-                <Input
-                  type="text"
-                  {...register(`students.${index}.name`)}
-                  defaultValue={student.fullName}
-                  disabled
-                />
-              </div>
-
-              <fieldset className="space-y-1 col-span-2">
-                <div className="flex justify-between text-xs font-medium">
-                  <p>
-                    <span className="text-base">😡</span> Not likely
-                  </p>
-                  <p>
-                    Very Likely <span className="text-base">😍</span>
-                  </p>
+                <div className="space-y-1">
+                  <Label>Ism familiya</Label>
+                  <Input
+                    className="disabled:opacity-90"
+                    type="text"
+                    {...register(`students.${index}.name`)}
+                    defaultValue={student.fullName}
+                    disabled
+                  />
                 </div>
 
-                <Controller
-                  name={`students.${index}.score`}
-                  control={control}
-                  defaultValue="-"
-                  render={({ field }) => (
-                    <RadioGroup
-                      value={field.value}
-                      onValueChange={(value) => field.onChange(value)}
-                      className="flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5"
-                    >
-                      {['-', 1, 2, 3, 4, 5].map((number) => (
-                        <label
-                          key={number}
-                          htmlFor={`radio-${student.id}-${number}`}
-                          className={`relative flex size-9 h-10 flex-1 cursor-pointer flex-col items-center justify-center gap-3 border border-input text-center text-sm font-medium ring-offset-background transition-colors first:rounded-s-lg last:rounded-e-lg data-[state=checked]:z-10 data-[state=checked]:border-ring data-[state=checked]:bg-accent data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 focus-visible:ring-2 focus-visible:ring-ring/70 focus-visible:ring-offset-2 ${
-                            field.value === number.toString()
-                              ? 'z-10 border-ring bg-accent'
-                              : ''
-                          }`}
-                        >
-                          <RadioGroupItem
-                            id={`radio-${student.id}-${number}`}
-                            value={number.toString()}
-                            className="sr-only"
-                          />
-                          {number}
-                        </label>
-                      ))}
-                    </RadioGroup>
-                  )}
-                />
-              </fieldset>
-            </div>
-          ))}
+                <fieldset className="space-y-1 col-span-2">
+                  <div className="flex justify-between text-xs font-medium">
+                    <p>
+                      <span className="text-base">😡</span> Yomon
+                    </p>
+                    <p>
+                      Yaxshi<span className="text-base">😍</span>
+                    </p>
+                  </div>
+
+                  <Controller
+                    name={`students.${index}.score`}
+                    control={control}
+                    defaultValue="-"
+                    render={({ field }) => (
+                      <RadioGroup
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                        className="flex gap-0 -space-x-px rounded-lg shadow-sm shadow-black/5"
+                      >
+                        {['-', 1, 2, 3, 4, 5].map((number) => (
+                          <label
+                            key={number}
+                            htmlFor={`radio-${student.id}-${number}`}
+                            className={`relative flex size-9 h-10 flex-1 cursor-pointer flex-col items-center justify-center gap-3 border border-input text-center text-sm font-medium ring-offset-background transition-colors first:rounded-s-lg last:rounded-e-lg data-[state=checked]:z-10 data-[state=checked]:border-ring data-[state=checked]:bg-accent data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 focus-visible:ring-2 focus-visible:ring-ring/70 focus-visible:ring-offset-2 ${
+                              field.value === number.toString()
+                                ? 'z-10 border-ring bg-accent'
+                                : ''
+                            }`}
+                          >
+                            <RadioGroupItem
+                              id={`radio-${student.id}-${number}`}
+                              value={number.toString()}
+                              className="sr-only"
+                            />
+                            {number}
+                          </label>
+                        ))}
+                      </RadioGroup>
+                    )}
+                  />
+                </fieldset>
+              </div>
+            ))}
+          </ScrollArea>
 
           {/* Submit Button */}
           <DialogFooter>

@@ -98,7 +98,7 @@ function Questions({ adminId, groupId, examId }) {
       <DeleteAlert
         id={id}
         collection={`users/${adminId}/groups/${groupId}/exams/${examId}/questions`}
-        fetchQuestions={fetchQuestions}
+        fetch={fetchQuestions}
         open={openDelete}
         setOpen={setOpenDelete}
       />
