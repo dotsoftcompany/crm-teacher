@@ -74,16 +74,29 @@ export function formatDateTime(data) {
   return `${formattedDay}.${formattedMonth}.${formattedYear} - ${formattedHour}:${formattedMinute}`;
 }
 
+export function formatDate2(dateString) {
+  const date = new Date(dateString);
+
+  if (isNaN(date)) {
+    return 'Invalid Date';
+  }
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear()).slice(-2);
+
+  return `${day}.${month}.${year}`;
+}
 export const scoreColor = (studentScore) => {
   return studentScore === 5
     ? 'bg-green-200 dark:bg-green-500'
     : studentScore === 4
     ? 'bg-blue-200 dark:bg-blue-500'
     : studentScore === 3
-    ? 'bg-yellow-200 dark:bg-yellow-500'
+    ? 'bg-orange-100 dark:bg-orange-500'
     : studentScore === 2
-    ? 'bg-purple-200 dark:bg-purple-500'
-    : studentScore === 1
     ? 'bg-red-200 dark:bg-red-500'
-    : 'bg-white dark:bg-muted';
+    : studentScore === 1
+    ? 'bg-gray-200 dark:bg-muted'
+    : 'bg-background';
 };

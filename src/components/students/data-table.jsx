@@ -32,12 +32,7 @@ import {
 } from '@/components/ui/table';
 import { formatPhoneNumber } from '@/lib/utils';
 
-export default function StudentsDataTable({
-  data,
-  setOpenDelete,
-  setOpenEdit,
-  children,
-}) {
+export default function StudentsDataTable({ data, loading, children }) {
   const history = useNavigate();
 
   const [sorting, setSorting] = React.useState([]);
@@ -215,9 +210,9 @@ export default function StudentsDataTable({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-16 text-center"
                 >
-                  No results.
+                  {loading ? 'Loading...' : 'No results.'}
                 </TableCell>
               </TableRow>
             )}
