@@ -20,6 +20,8 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/api/firebase';
 import { format } from 'date-fns';
 import DeleteAlert from '@/components/dialogs/delete-alert';
+import EditDialog from '@/components/dialogs/edit-dialog';
+import EditEvaluation from './edit';
 
 function Evaluation({ groupId, students }) {
   const { adminId } = useMainContext();
@@ -88,6 +90,16 @@ function Evaluation({ groupId, students }) {
         fetch={fetchEvaluations}
       />
 
+      <EditDialog open={openEdit} setOpen={setOpenEdit}>
+        <EditEvaluation
+          id={id}
+          evaluations={evaluations}
+          groupId={groupId}
+          setOpen={setOpenEdit}
+          fetch={fetchEvaluations}
+        />
+      </EditDialog>
+
       <DeleteAlert
         id={id}
         collection={`users/${adminId}/groups/${groupId}/evaluations`}
@@ -97,34 +109,29 @@ function Evaluation({ groupId, students }) {
       />
 
       <div className="space-y-2 pt-2">
-        <div className="flex justify-between items-center">
-          <h2 className="hidden lg:block text-lg font-bold tracking-tight">
-            O'quvchilar ballari
-          </h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <ReactDatePicker
-                placeholderText="Select date"
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                dateFormat="dd.MM.yyyy"
-                className="w-fit py-2 px-3 border rounded-md bg-background"
+        <div className="flex items-center justify-between gap-2">
+          <div className="relative">
+            <ReactDatePicker
+              placeholderText="Select date"
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              dateFormat="dd.MM.yyyy"
+              className="w-fit lg:w-80 py-2 px-3 border rounded-md bg-background"
+            />
+            {selectedDate && (
+              <X
+                onClick={clearDate}
+                className="absolute top-1/2 -translate-y-1/2 right-2 lg:right-3 h-4 w-4 cursor-pointer"
               />
-              {selectedDate && (
-                <X
-                  onClick={clearDate}
-                  className="absolute top-1/2 -translate-y-1/2 right-2 h-4 w-4 cursor-pointer"
-                />
-              )}
-            </div>
-            <Button
-              onClick={() => setOpenAddEvaluation(true)}
-              variant="secondary"
-              className="dark:bg-white dark:text-black"
-            >
-              Baholash
-            </Button>
+            )}
           </div>
+          <Button
+            onClick={() => setOpenAddEvaluation(true)}
+            variant="secondary"
+            className="dark:bg-white dark:text-black"
+          >
+            Baholash
+          </Button>
         </div>
 
         <div className="overflow-x-auto rounded-lg">
@@ -186,7 +193,8 @@ function Evaluation({ groupId, students }) {
                           <DropdownMenuItem
                             className="!text-sm"
                             onSelect={() => {
-                              // setOpenEdit(true);
+                              setOpenEdit(true);
+                              setId(evaluation.id);
                               document.body.style.pointerEvents = '';
                             }}
                           >

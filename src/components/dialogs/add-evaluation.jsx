@@ -16,12 +16,12 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '../ui/use-toast';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/api/firebase';
 import { useMainContext } from '@/context/main-context';
 import { Loader, Search } from 'lucide-react';
-import { ScrollArea } from '../ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '../ui/use-toast';
 
 function AddEvaluation({ open, setOpen, groupId, groupStudents, fetch }) {
   const { teacherData } = useMainContext();
