@@ -43,7 +43,8 @@
     "react-hook-form": "^7.53.0",
     "react-phone-number-input": "^3.4.9",
     "react-router-dom": "^6.26.2",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@radix-ui/react-slot": "^1.1.0",

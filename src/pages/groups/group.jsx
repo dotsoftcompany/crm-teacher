@@ -56,6 +56,8 @@ import { scoreColor } from '@/lib/utils';
 import AddEvaluation from '@/components/dialogs/add-evaluation';
 import { format } from 'date-fns';
 import Evaluation from '@/components/groups/evaluation/evaluation';
+import { Badge } from '@/components/ui/badge';
+import Tasks from '../../components/groups/tasks/tasks';
 
 const Group = () => {
   const { groupId } = useParams();
@@ -212,7 +214,7 @@ const Group = () => {
         title="Guruhlar ro'yxati"
         titleLink="/groups"
         subtitle={`${
-          courses.filter((item) => item.id === group.courseId)[0].courseTitle
+          courses.filter((item) => item.id === group.courseId)[0]?.courseTitle
         } #${group.groupNumber}`}
       />
       <GroupHeader group={group} />
@@ -252,9 +254,7 @@ const Group = () => {
           <TabsTrigger className="hidden" value="attendance_check">
             Yo'qlamalar
           </TabsTrigger>
-          <TabsTrigger className="hidden" value="tasks">
-            Topshiriqlar
-          </TabsTrigger>
+          <TabsTrigger value="tasks">Vazifalar</TabsTrigger>
           <TabsTrigger value="evaluation">Baholash</TabsTrigger>
           <TabsTrigger value="exams">Imtihonlar</TabsTrigger>
         </TabsList>
@@ -339,9 +339,11 @@ const Group = () => {
             </Table>
           </div>
         </TabsContent>
-        <TabsContent value="tasks">tasks</TabsContent>
+        <TabsContent value="tasks">
+          <Tasks groupId={groupId} adminId={adminId} />
+        </TabsContent>
         <TabsContent value="evaluation">
-          <Evaluation groupId={groupId} students={groupStudents} />
+          <Evaluation groupId={groupId} students={groupStudents} groupStudents={groupStudents} />
         </TabsContent>
         <TabsContent value="exams">
           <div className="space-y-2 pt-2">

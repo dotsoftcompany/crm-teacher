@@ -19,6 +19,7 @@ import LessonsSchedule from '@/pages/lessons-schedule';
 import Account from '@/pages/settings/account';
 import GroupExam from '@/pages/groups/exam/exam';
 import StudentResult from '@/pages/groups/exam/student-result';
+import GroupTask from './groups/tasks/task';
 
 function Dashboard() {
   return (
@@ -39,6 +40,7 @@ function Dashboard() {
           <Route path="/groups" element={<Groups />} />
           <Route path="/groups/:groupId" element={<Group />} />
           <Route path="/groups/:groupId/exam/:examId" element={<GroupExam />} />
+          <Route path="/groups/:groupId/task/:taskId" element={<GroupTask />} />
           <Route
             path="/groups/:groupId/exams/:examId/student/:studentId"
             element={<StudentResult />}

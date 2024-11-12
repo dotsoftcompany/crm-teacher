@@ -107,7 +107,7 @@ function LessonsSchedule() {
                                 {
                                   courses.filter(
                                     (item) => item.id === groupForDay.courseId
-                                  )[0].courseTitle
+                                  )[0]?.courseTitle
                                 }
                               </p>
                               <small className="opacity-80">
