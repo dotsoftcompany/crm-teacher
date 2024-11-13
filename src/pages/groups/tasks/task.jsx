@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react';
 import { db } from '@/api/firebase';
 import BreadcrumbComponent from '@/components/breadcrumb';
 import AddQuestion from '@/components/groups/exam/add-question';
@@ -5,42 +6,38 @@ import ExamHeader from '@/components/groups/exam/exam-header';
 import Questions from '@/components/groups/exam/questions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 import { useMainContext } from '@/context/main-context';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
+  orderBy,
   query,
+  serverTimestamp,
   where,
 } from 'firebase/firestore';
-import {
-  Eye,
-  Image,
-  Paperclip,
-  PlusCircle,
-  Search,
-  Send,
-  Trash,
-} from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { Loader, Paperclip, Send } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import TaskHeader from '@/components/groups/tasks/task-header';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useForm } from 'react-hook-form';
+
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import { useToast } from '@/components/ui/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import TaskChat from '@/components/groups/tasks/chat';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const GroupTask = () => {
   const { adminId, teacherData } = useMainContext();
@@ -51,13 +48,14 @@ const GroupTask = () => {
 
   const [tasks, setTasks] = useState([]);
   const [groupStudents, setGroupStudents] = useState([]);
-  const [submittedStudents, setSubmittedStudents] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(null);
 
   const task = tasks.find((ex) => ex.id === taskId);
 
   const fetchTasks = async () => {
+    setLoading(true);
     try {
       const ref = collection(db, `users/${adminId}/groups/${groupId}/tasks`);
       const querySnapshot = await getDocs(ref);
@@ -68,9 +66,9 @@ const GroupTask = () => {
       }));
 
       setTasks(tasksList);
-      setLoading(false);
     } catch (err) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -110,36 +108,52 @@ const GroupTask = () => {
     fetchGroupStudents();
   }, [adminId, groupId]);
 
-  function formatDate(timestamp) {
-    const date = new Date(timestamp);
+  useEffect(() => {
+    const chatRef = collection(
+      db,
+      `users/${adminId}/groups/${groupId}/tasks/${taskId}/chat`
+    );
+    const q = query(chatRef, orderBy('timestamp', 'asc'));
 
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedMessages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(fetchedMessages);
+    });
 
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return () => unsubscribe();
+  }, [taskId, groupId, adminId]);
 
-    return `${day}.${month}.${year} - ${hours}:${minutes}`;
-  }
-
-  const getInitials = (fullName) => {
-    const nameParts = fullName.split(' ');
-
-    if (nameParts.length === 1) {
-      return nameParts[0].slice(0, 2).toUpperCase();
-    } else {
-      return nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase();
-    }
-  };
-
-  if (!group) {
+  if (!group && loading) {
     return (
-      <div className="px-4 lg:px-8 mx-auto py-4">
-        <h2 className="text-2xl font-bold tracking-tight">Yuklanmoqda</h2>
-        <p className="text-muted-foreground">
-          Siz qidirayotgan guruh topilmadi!
-        </p>
+      <div className="p-4 md:p-8 space-y-6">
+        <div className="space-y-5">
+          <Skeleton className="h-4 w-1/3" />
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-72" />
+            <Skeleton className="h-3 w-1/2" />
+            <Skeleton className="h-3 w-1/3" />
+            <Skeleton className="h-3 w-1/3" />
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-4 w-44" />
+              <Skeleton className="h-4 w-44" />
+              <Skeleton className="h-4 w-44" />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative border border-border rounded-md my-2 h-[70vh] animate-pulse">
+          <div className="w-full p-4 bg-muted rounded-t-md">
+            <div className="animate-pulse space-y-2">
+              <div className="h-4 w-1/2 mg-muted rounded"></div>
+              <div className="h-3 w-1/4 mg-muted rounded"></div>
+            </div>
+          </div>
+
+          <div className="overflow-y-auto max-h-[calc(100vh-120px)]"></div>
+        </div>
       </div>
     );
   }
@@ -150,123 +164,22 @@ const GroupTask = () => {
         title="Guruhlar ro'yxati"
         titleLink="/groups"
         subtitle={`${
-          courses.filter((item) => item.id === group.courseId)[0].courseTitle
-        } #${group.groupNumber}`}
+          courses.filter((item) => item.id === group.courseId)[0]?.courseTitle
+        } #${group?.groupNumber}`}
         subtitleLink={`/groups/${groupId}`}
         subtitle2={`${task?.title} (task)`}
       />
-      <TaskHeader task={task} loading={loading} />
-
-      {/* <div className="flex items-center gap-2 mt-2">
-        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border hover:border-ring duration-200 cursor-pointer">
-          <Paperclip className="w-5 h-5" />
-          <div>
-            <h4 className="text-sm font-medium">Open Pdf file new window</h4>
-            <p className="text-sm text-muted-foreground">attached.pdf</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border hover:border-ring duration-200 cursor-pointer">
-          <Paperclip className="w-5 h-5" />
-          <div>
-            <h4 className="text-sm font-medium">Open Pdf file new window</h4>
-            <p className="text-sm text-muted-foreground">attached2.pdf</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border hover:border-ring duration-200 cursor-pointer">
-          <Image className="w-5 h-5" />
-          <div>
-            <h4 className="text-sm font-medium">Open Image file new window</h4>
-            <p className="text-sm text-muted-foreground">attached.jpg</p>
-          </div>
-        </div>
-      </div> */}
+      <TaskHeader task={task} loading={loading} messages={messages} />
 
       {/* Chat */}
 
-      <div className="relative border border-border rounded-md my-2 h-screen">
-        <div className="w-full p-4 bg-muted rounded-t-md">
-          <h4 className="text-sm">{`${
-            courses.filter((item) => item.id === group.courseId)[0].courseTitle
-          } #${group.groupNumber}`}</h4>
-          <p className="text-muted-foreground text-sm">
-            {groupStudents?.length} members
-          </p>
-        </div>
-
-        <div className="overflow-y-auto max-h-[calc(100vh-120px)]">
-          {' '}
-          {/* Updated */}
-          <div className="p-4">
-            <div className="w-full flex items-center justify-center my-3">
-              <Badge variant="secondary">Wednesday, July 25th</Badge>
-            </div>
-
-            <div>
-              <div className="flex items-start gap-2 my-2">
-                <Avatar
-                  title={teacherData?.fullName}
-                  className="cursor-pointer"
-                >
-                  <AvatarImage src="" />
-                  <AvatarFallback>
-                    {getInitials(teacherData?.fullName)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border hover:border-ring duration-200 cursor-pointer bg-muted">
-                    <Paperclip className="w-5 h-5" />
-                    <div>
-                      <h4 className="text-sm font-medium">
-                        Open Pdf file new window
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        attached.pdf
-                      </p>
-                    </div>
-                  </div>
-                  <small className="text-muted-foreground float-right mr-2">
-                    12:39
-                  </small>
-                </div>
-              </div>
-              <div className="flex items-start gap-2 my-2">
-                <Avatar
-                  title={teacherData?.fullName}
-                  className="cursor-pointer"
-                >
-                  <AvatarImage src="" />
-                  <AvatarFallback>
-                    {getInitials(teacherData?.fullName)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border hover:border-ring duration-200 cursor-pointer bg-muted">
-                    <Image className="w-5 h-5" />
-                    <div>
-                      <h4 className="text-sm font-medium">
-                        Open Image file new window
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        attached.jpg
-                      </p>
-                    </div>
-                  </div>
-                  <small className="text-muted-foreground float-right mr-2">
-                    12:39
-                  </small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 w-full p-4 bg-muted rounded-b-md flex items-center gap-2">
-          <Input className="w-full" placeholder="Type here your message..." />
-          <button className="bg-background hover:opacity-80 duration-200 flex items-center justify-center p-3 cursor-pointer rounded-md">
-            <Send className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      <TaskChat
+        task={task}
+        groupStudents={groupStudents}
+        groupId={groupId}
+        taskId={taskId}
+        messages={messages}
+      />
     </div>
   );
 };

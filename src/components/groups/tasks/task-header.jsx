@@ -3,8 +3,9 @@ import React from 'react';
 import { Calendar } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
-function TaskHeader({ task, loading }) {
+function TaskHeader({ task, messages, loading }) {
   if (loading) {
     return (
       <div className="space-y-2 py-4 w-full border-b border-border">
@@ -33,27 +34,40 @@ function TaskHeader({ task, loading }) {
       </div>
     );
   }
+
+  function formatDate(timestamp) {
+    if (!timestamp) return null;
+
+    const { seconds, nanoseconds } = timestamp;
+    const date = new Date(seconds * 1000 + nanoseconds / 1000000);
+    return format(date, 'dd.MM.yy');
+  }
+
   return (
-    <div className="space-y-2 py-4 w-full border-b border-border">
+    <div className="space-y-2 py-4 w-full">
       <div>
         <h1 className="text-lg md:text-xl font-semibold">{task?.title}</h1>
-        <p className="text-sm text-muted-foreground max-w-xl">
+        <p className="text-sm text-muted-foreground max-w-2xl">
           {task?.description}
         </p>
       </div>
 
       <div className="flex items-center gap-3 md:gap-5">
-        {/* <div className="flex items-center gap-1 text-xs md:text-sm">
-          <Badge className="px-1.5">3</Badge>
+        <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+          <Calendar className="w-4 h-4" />
+          <span>{formatDate(task?.due)}</span>
+        </div>
+        <div className="flex items-center gap-1 text-xs md:text-sm">
+          <Badge variant="active" className="px-2">
+            {task?.images ? task?.images?.length : 0}
+          </Badge>
           <span>Attachments</span>
         </div>
         <div className="flex items-center gap-1 text-xs md:text-sm">
-          <Badge className="px-1.5">0</Badge>
+          <Badge variant="inactive" className="px-2">
+            {messages ? messages?.length : 0}
+          </Badge>
           <span>Message</span>
-        </div> */}
-        <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
-          <Calendar className="w-4 h-4" />
-          <span>{task?.due}</span>
         </div>
       </div>
     </div>

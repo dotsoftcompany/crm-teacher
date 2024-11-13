@@ -59,7 +59,10 @@ function LessonsSchedule() {
         <div className="grid grid-cols-8 gap-x-1 md:gap-x-1.5 min-w-[50rem] w-full">
           <div></div>
           {days.map((day) => (
-            <div key={day} className="font-semibold text-center p-2 pb-4">
+            <div
+              key={day}
+              className="font-semibold text-center bg-muted rounded-md p-2 pb-3 mb-2"
+            >
               {day}
             </div>
           ))}

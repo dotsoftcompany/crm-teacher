@@ -30,7 +30,11 @@ function BreadcrumbComponent({
           <BreadcrumbItem>
             <Link
               to={subtitle ? titleLink : null}
-              className={subtitle ? 'cursor-pointer' : 'cursor-text'}
+              className={
+                subtitle
+                  ? 'cursor-pointer'
+                  : 'cursor-text text-black dark:text-white'
+              }
             >
               <BreadcrumbLink>{title}</BreadcrumbLink>
             </Link>
@@ -41,7 +45,11 @@ function BreadcrumbComponent({
               <BreadcrumbItem>
                 <Link
                   to={subtitle2 ? subtitleLink : null}
-                  className={subtitle ? 'cursor-pointer' : 'cursor-text'}
+                  className={
+                    subtitle && !subtitle2
+                      ? 'cursor-text text-black dark:text-white'
+                      : 'cursor-pointer'
+                  }
                 >
                   <BreadcrumbLink>{subtitle}</BreadcrumbLink>
                 </Link>
@@ -52,7 +60,9 @@ function BreadcrumbComponent({
             <>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink>{subtitle2}</BreadcrumbLink>
+                <BreadcrumbLink className="text-black dark:text-white">
+                  {subtitle2}
+                </BreadcrumbLink>
               </BreadcrumbItem>
             </>
           )}

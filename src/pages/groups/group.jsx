@@ -57,7 +57,7 @@ import AddEvaluation from '@/components/dialogs/add-evaluation';
 import { format } from 'date-fns';
 import Evaluation from '@/components/groups/evaluation/evaluation';
 import { Badge } from '@/components/ui/badge';
-import Tasks from '../../components/groups/tasks/tasks';
+import Tasks from '@/components/groups/tasks/tasks';
 
 const Group = () => {
   const { groupId } = useParams();

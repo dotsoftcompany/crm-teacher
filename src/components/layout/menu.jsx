@@ -121,8 +121,8 @@ export function Menu({ isOpen }) {
                             <Button
                               className={`w-full justify-start h-10 mb-1 ${
                                 active
-                                  ? 'bg-white text-primary hover:opacity-90 hover:bg-white dark:bg-accent dark:hover:bg-accent'
-                                  : 'bg-accent hover:bg-white text-primary dark:bg-transparent dark:hover:bg-accent'
+                                  ? 'bg-blue-600 text-white hover:opacity-90 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue0600'
+                                  : 'bg-muted hover:bg-blue-600 hover:text-white text-primary dark:bg-transparent dark:hover:bg-accent'
                               }`}
                               asChild
                             >
@@ -177,7 +177,7 @@ export function Menu({ isOpen }) {
                     <Button
                       onClick={() => {}}
                       variant="outline"
-                      className="w-full h-10 mt-5 mx-2 justify-start pl-4"
+                      className="w-full h-10 mt-5 mx-2 justify-start hover:bg-white hover:border-blue-400 hover:dark:border-border hover:dark:bg-muted pl-4"
                     >
                       <span className={cn(isOpen === false ? '' : 'mr-3')}>
                         <UserCircle2 size={18} />
