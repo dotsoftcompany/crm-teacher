@@ -29,6 +29,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   where,
 } from 'firebase/firestore';
@@ -37,96 +38,100 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 const GroupExam = () => {
-  const { adminId } = useMainContext();
-
+  const { adminId, groups, courses } = useMainContext();
   const { groupId, examId } = useParams();
-
-  const { groups, courses } = useMainContext();
   const group = groups.find((g) => g.id === groupId);
 
   const [exams, setExams] = useState([]);
   const [groupStudents, setGroupStudents] = useState([]);
   const [submittedStudents, setSubmittedStudents] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [qLoading, setQLoading] = useState(false);
 
   const exam = exams.find((ex) => ex.id === examId);
 
-  const fetchExams = async () => {
+  const fetchData = async () => {
+    setLoading(true);
     try {
+      // Fetch Exams
       const examsRef = collection(
         db,
         `users/${adminId}/groups/${groupId}/exams`
       );
-      const querySnapshot = await getDocs(examsRef);
-
-      const examsList = querySnapshot.docs.map((doc) => ({
+      const examsSnapshot = await getDocs(examsRef);
+      const examsList = examsSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      setExams(examsList);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
-  const fetchGroupStudents = async () => {
-    setLoading(true);
-
-    try {
+      // Fetch Group Students
       const groupRef = doc(db, `users/${adminId}/groups`, groupId);
       const groupSnap = await getDoc(groupRef);
+      let fetchedStudents = [];
 
       if (groupSnap.exists()) {
-        const groupData = groupSnap.data();
-        const studentIds = groupData.students || [];
-        console.log('Student IDs:', studentIds);
-
+        const studentIds = groupSnap.data().students || [];
         if (studentIds.length > 0) {
           const studentsRef = collection(db, `students`);
-          const q = query(
+          const studentsQuery = query(
             studentsRef,
-            where('__name__', 'in', studentIds.slice(0, 10))
-          ); // Only the first 10 IDs
-
-          const querySnapshot = await getDocs(q);
-          const fetchedStudents = querySnapshot.docs.map((doc) => ({
+            where('__name__', 'in', studentIds.slice(0, 10)) // Fetch only the first 10 IDs
+          );
+          const studentsSnapshot = await getDocs(studentsQuery);
+          fetchedStudents = studentsSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
-
-          setGroupStudents(fetchedStudents);
-        } else {
-          setGroupStudents([]);
         }
-      } else {
-        console.log('Group not found.');
       }
-    } catch (error) {
-      console.error('Error fetching group data:', error);
-      setError(error.message);
+
+      // Fetch Submitted Students
+      const submittedStudentsRef = collection(
+        db,
+        `users/${adminId}/groups/${groupId}/exams/${examId}/submittedStudents`
+      );
+      const submittedSnapshot = await getDocs(submittedStudentsRef);
+      const submittedList = submittedSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Update state with fetched data
+      setExams(examsList);
+      setGroupStudents(fetchedStudents);
+      setSubmittedStudents(submittedList);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchSubmittedStudents = async () => {
+  const fetchQuestions = async () => {
     try {
-      const submittedStudentsRef = collection(
+      const questionsRef = collection(
         db,
-        `users/${adminId}/groups/${groupId}/exams/${examId}/submittedStudents`
+        `users/${adminId}/groups/${groupId}/exams/${examId}/questions`
       );
-      const querySnapshot = await getDocs(submittedStudentsRef);
 
-      const submittedStudentsList = querySnapshot.docs.map((doc) => ({
+      const questionsQuery = query(questionsRef, orderBy('createdAt', 'asc'));
+      const querySnapshot = await getDocs(questionsQuery);
+
+      const questionsList = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      setSubmittedStudents(submittedStudentsList);
+      setQuestions(questionsList);
+
+      const savedAnswers = JSON.parse(
+        localStorage.getItem(`exam-${examId}-answers`)
+      );
+      setStudentAnswers(
+        savedAnswers || new Array(questionsList.length).fill('')
+      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -135,10 +140,16 @@ const GroupExam = () => {
   };
 
   useEffect(() => {
-    fetchGroupStudents();
-    fetchExams();
-    fetchSubmittedStudents();
+    if (adminId && groupId) {
+      fetchData();
+    }
   }, [adminId, groupId]);
+
+  useEffect(() => {
+    if (adminId && groupId && examId) {
+      fetchQuestions();
+    }
+  }, [adminId, groupId, examId]);
 
   function formatDate(timestamp) {
     const date = new Date(timestamp);
@@ -153,6 +164,46 @@ const GroupExam = () => {
     return `${day}.${month}.${year} - ${hours}:${minutes}`;
   }
 
+  function calculateStudentResults(questions, submittedStudents) {
+    return submittedStudents.map((student) => {
+      const { id, fullName, answers: studentAnswers, timestamp } = student;
+      let correctCount = 0;
+
+      const results = questions.map((question, index) => {
+        const correctAnswer = question.correctAnswer.toLowerCase();
+        const studentAnswer = studentAnswers[index]?.toLowerCase();
+
+        const isCorrect = studentAnswer === correctAnswer;
+        if (isCorrect) correctCount++;
+
+        return isCorrect ? true : false;
+      });
+
+      const totalQuestions = questions.length;
+      const rawPercentage = (correctCount / totalQuestions) * 100;
+      const correctPercentage = parseFloat(rawPercentage.toFixed(2));
+
+      return {
+        id,
+        fullName,
+        correctCount,
+        correctPercentage,
+        results,
+        timestamp,
+      };
+    });
+  }
+
+  const results = calculateStudentResults(questions, submittedStudents);
+
+  const mergedStudents = groupStudents.map((groupStudent) => {
+    const submittedStudent = results.find(
+      (subStudent) => subStudent.id === groupStudent.id
+    );
+
+    return submittedStudent || groupStudent;
+  });
+
   if (!group) {
     return (
       <div className="px-4 lg:px-8 mx-auto py-4">
@@ -163,16 +214,6 @@ const GroupExam = () => {
       </div>
     );
   }
-  const mergedStudents = groupStudents.map((groupStudent) => {
-    // Find the student in submittedStudents
-    const submittedStudent = submittedStudents.find(
-      (subStudent) => subStudent.id === groupStudent.id
-    );
-
-    // If found in submittedStudents, return submittedStudent, else return groupStudent
-    return submittedStudent || groupStudent;
-  });
-  console.log(mergedStudents);
 
   return (
     <div className="px-4 lg:px-8 mt-4">
@@ -219,10 +260,11 @@ const GroupExam = () => {
 
             <div className="overflow-x-auto">
               <Table className="min-w-[50rem] w-full">
-                <TableCaption>
-                  {(loading && 'Loading...') ||
-                    (!mergedStudents.length && 'No result.')}
-                </TableCaption>
+                {loading && (
+                  <TableCaption className="bg-muted/50 py-5 mt-0">
+                    Loading...
+                  </TableCaption>
+                )}
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-64 rounded-tl-md">
@@ -252,9 +294,15 @@ const GroupExam = () => {
                         {student?.results ? formatDate(student.timestamp) : '-'}
                       </TableCell>
                       <TableCell>
-                        {student?.results ? '1/10' : '0/10'}
+                        {student?.results
+                          ? `${student.correctCount}/${questions?.length}`
+                          : `0/${questions?.length}`}
                       </TableCell>
-                      <TableCell>{student?.results ? '10%' : '0%'}</TableCell>
+                      <TableCell>
+                        {student?.results
+                          ? `${student.correctPercentage}%`
+                          : '0%'}
+                      </TableCell>
                       <TableCell className="text-center">
                         <Link
                           to={`/groups/${groupId}/exams/${examId}/student/${student.id}`}
@@ -284,10 +332,22 @@ const GroupExam = () => {
           </div>
         </TabsContent>
         <TabsContent value="questions">
-          <Questions adminId={adminId} groupId={groupId} examId={examId} />
+          <Questions
+            adminId={adminId}
+            groupId={groupId}
+            examId={examId}
+            questions={questions}
+            loading={qLoading}
+            fetchQuestions={fetchQuestions}
+          />
         </TabsContent>
         <TabsContent value="add-question">
-          <AddQuestion adminId={adminId} groupId={groupId} examId={examId} />
+          <AddQuestion
+            adminId={adminId}
+            groupId={groupId}
+            examId={examId}
+            fetch={fetchQuestions}
+          />
         </TabsContent>
       </Tabs>
     </div>

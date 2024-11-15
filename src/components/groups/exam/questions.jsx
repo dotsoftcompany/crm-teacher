@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/api/firebase';
+import React, { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,69 +13,39 @@ import EditDialog from '@/components/dialogs/edit-dialog';
 import DeleteAlert from '@/components/dialogs/delete-alert';
 import QuestionEdit from './questionEdit';
 
-function Questions({ adminId, groupId, examId }) {
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function Questions({ adminId, groupId, examId, questions, fetchQuestions }) {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [id, setId] = useState('');
   const options = ['A', 'B', 'C', 'D'];
 
-  const fetchQuestions = async () => {
-    try {
-      const questionsRef = collection(
-        db,
-        `users/${adminId}/groups/${groupId}/exams/${examId}/questions`
-      );
-      const querySnapshot = await getDocs(questionsRef);
-
-      const questionsList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setQuestions(questionsList);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [adminId, groupId, examId]);
-
-  if (loading) {
-    return (
-      <ul className="w-full">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <li key={index} className="w-full">
-            <div className="flex items-center justify-between my-2">
-              {/* Skeleton for question title */}
-              <Skeleton className="h-6 w-1/2" />
-              <Skeleton className="h-8 w-8 rounded-full" />
-            </div>
-            <div className="border border-border rounded-md">
-              {/* Skeleton for answers */}
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex items-center py-2.5 px-4 first:rounded-t-md last:rounded-b-md border-b border-border"
-                >
-                  <Skeleton className="w-5 h-5 rounded-full mr-4" />
-                  <Skeleton className="h-4 w-full" />
-                </div>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
-  if (error) return <p>Error fetching questions: {error}</p>;
+  // if (loading) {
+  //   return (
+  //     <ul className="w-full">
+  //       {Array.from({ length: 3 }).map((_, index) => (
+  //         <li key={index} className="w-full">
+  //           <div className="flex items-center justify-between my-2">
+  //             {/* Skeleton for question title */}
+  //             <Skeleton className="h-6 w-1/2" />
+  //             <Skeleton className="h-8 w-8 rounded-full" />
+  //           </div>
+  //           <div className="border border-border rounded-md">
+  //             {/* Skeleton for answers */}
+  //             {Array.from({ length: 4 }).map((_, i) => (
+  //               <div
+  //                 key={i}
+  //                 className="flex items-center py-2.5 px-4 first:rounded-t-md last:rounded-b-md border-b border-border"
+  //               >
+  //                 <Skeleton className="w-5 h-5 rounded-full mr-4" />
+  //                 <Skeleton className="h-4 w-full" />
+  //               </div>
+  //             ))}
+  //           </div>
+  //         </li>
+  //       ))}
+  //     </ul>
+  //   );
+  // }
 
   return (
     <div>

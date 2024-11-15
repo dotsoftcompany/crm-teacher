@@ -58,6 +58,7 @@ import { format } from 'date-fns';
 import Evaluation from '@/components/groups/evaluation/evaluation';
 import { Badge } from '@/components/ui/badge';
 import Tasks from '@/components/groups/tasks/tasks';
+import Exams from '@/components/groups/exam/exams';
 
 const Group = () => {
   const { groupId } = useParams();
@@ -241,13 +242,6 @@ const Group = () => {
         setOpen={setShowAbsenteeStudentsDialog}
       />
 
-      <AddExamDialog
-        open={openAddExam}
-        setOpen={setOpenAddExam}
-        groupId={groupId}
-        fetchExams={fetchExams}
-      />
-
       <Tabs defaultValue="students" className="mt-4">
         <TabsList>
           <TabsTrigger value="students">O'quvchilar ro'yxati</TabsTrigger>
@@ -343,103 +337,14 @@ const Group = () => {
           <Tasks groupId={groupId} adminId={adminId} />
         </TabsContent>
         <TabsContent value="evaluation">
-          <Evaluation groupId={groupId} students={groupStudents} groupStudents={groupStudents} />
+          <Evaluation
+            groupId={groupId}
+            students={groupStudents}
+            groupStudents={groupStudents}
+          />
         </TabsContent>
         <TabsContent value="exams">
-          <div className="space-y-2 pt-2">
-            <div className="flex justify-between items-center">
-              <div className="relative">
-                <Input
-                  className="peer pe-9 ps-9 w-full lg:w-96"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Imtihonni qidirish..."
-                  type="search"
-                />
-                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
-                  <Search size={16} strokeWidth={2} />
-                </div>
-              </div>
-              <Button
-                onClick={() => setOpenAddExam(true)}
-                variant="secondary"
-                className="dark:bg-white dark:text-black"
-              >
-                Imtihon qo'shish
-              </Button>
-            </div>
-
-            <div className="overflow-x-auto">
-              <Table className="min-w-[50rem] w-full">
-                <TableCaption className="hidden">
-                  A list of absent students for the selected date.
-                </TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-72 rounded-tl-md">Title</TableHead>
-                    <TableHead>Start date</TableHead>
-                    <TableHead>End date</TableHead>
-                    <TableHead>Place</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Is show</TableHead>
-                    <TableHead className="rounded-tr-md text-center">
-                      View
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredExams.map((exam) => (
-                    <TableRow>
-                      <Link to={`/groups/${groupId}/exam/${exam.id}`}>
-                        <TableCell className="w-72">{exam?.title}</TableCell>
-                      </Link>
-                      <TableCell>{exam?.start}</TableCell>
-                      <TableCell>{exam?.end}</TableCell>
-                      <TableCell>{exam?.type}</TableCell>
-                      <TableCell>{exam?.status}</TableCell>
-                      <TableCell
-                        className="flex items-center mt-2.5 gap-1.5"
-                        title="O'quvchilarga ko'rsatish"
-                      >
-                        <Switch
-                          key={exam?.id}
-                          disabled={!!disabled[exam.id]}
-                          checked={exam?.isShow}
-                          onCheckedChange={() =>
-                            toggleIsShow(exam?.id, exam?.isShow)
-                          }
-                        />
-                        <Loader
-                          className={`w-4 h-4 animate-spin ${
-                            !!disabled[exam.id] ? 'opacity-100' : 'opacity-0'
-                          }`}
-                        />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Link to={`/groups/${groupId}/exam/${exam.id}`}>
-                          <Button
-                            onClick={() => setShowAbsenteeStudentsDialog(true)}
-                            variant="link"
-                          >
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Eye className="w-5 h-5" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <small>Batafsil</small>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
+          <Exams groupId={groupId} />
         </TabsContent>
       </Tabs>
     </div>

@@ -1,13 +1,15 @@
 import { useFieldArray, useForm } from 'react-hook-form';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/api/firebase';
 
 import { PlusCircle, Save, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
 
-function AddQuestion({ adminId, groupId, examId }) {
+function AddQuestion({ adminId, groupId, examId, fetch }) {
+  const { toast } = useToast();
   const { control, register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: {
       questions: [{ title: '', answers: ['', '', '', ''], correctAnswer: '' }],
@@ -25,8 +27,13 @@ function AddQuestion({ adminId, groupId, examId }) {
         db,
         `users/${adminId}/groups/${groupId}/exams/${examId}/questions`
       );
-      await addDoc(questionsCollectionRef, questionData);
-      console.log('Question added:', questionData);
+
+      await addDoc(questionsCollectionRef, {
+        ...questionData,
+        createdAt: serverTimestamp(),
+      });
+
+      fetch();
     } catch (error) {
       console.error('Error adding question:', error);
     }
@@ -37,7 +44,9 @@ function AddQuestion({ adminId, groupId, examId }) {
       await addQuestion(question);
     }
     reset();
-    console.log('All questions have been saved');
+    toast({
+      title: 'All questions have been saved',
+    });
   };
 
   const addNewQuestion = () => {
