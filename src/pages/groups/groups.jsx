@@ -38,7 +38,6 @@ function Groups() {
     }
   });
 
-  console.log();
 
   return (
     <div className="px-4 lg:px-8 mx-auto my-4 space-y-4">

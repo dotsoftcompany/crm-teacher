@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function PhoneNumberInput({ value, onChange }) {
-  console.log('value', value);
 
   return (
     <div className="space-y-2" dir="ltr">

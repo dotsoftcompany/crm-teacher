@@ -36,7 +36,6 @@ function StudentResult() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  console.log(groupStudents);
 
   const fetchData = async () => {
     setLoading(true);
@@ -170,8 +169,6 @@ function StudentResult() {
 
   const student = mergedStudents.find((s) => s.id === studentId);
 
-  console.log(results);
-
   return (
     <div className="px-4 lg:px-8 mx-auto my-4 space-y-4">
       <BreadcrumbComponent
@@ -188,15 +185,15 @@ function StudentResult() {
       <div className="my-5 space-y-2">
         <ul className="flex flex-wrap items-center gap-2">
           {student?.results?.map((answer, index) => (
-            <li className="relative bg-muted hover:bg-muted/80 rounded w-14 h-10 flex items-center justify-center">
+            <li className="relative bg-muted hover:bg-muted/80 rounded w-12 h-8 flex items-center justify-center">
               <span className="font-medium">{index + 1}</span>
               {answer?.correct ? (
                 <span className="absolute top-0 right-0 py-0.5 px-1 rounded-bl-sm bg-green-500 text-white">
-                  <Check className="h-3 w-3" />
+                  <Check className="h-2.5 w-2.5" />
                 </span>
               ) : (
                 <span className="absolute top-0 right-0 py-0.5 px-1 rounded-bl-sm bg-red-500 text-white">
-                  <X className="h-3 w-3" />
+                  <X className="h-2.5 w-2.5" />
                 </span>
               )}
             </li>
@@ -219,7 +216,7 @@ function StudentResult() {
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-gray-500" />
             <span className="text-xs">
-              O'tkazib yuborilganlari
+              O'tkazib yuborilganlar
               <b> 0</b>
             </span>
           </div>
@@ -267,7 +264,7 @@ function StudentResult() {
                     }`}
                   />
                   <p className="mt-1 text-base text-muted-foreground">
-                    {answer?.title}
+                    {answer?.studentAnswer}
                   </p>
                 </div>
               </CardContent>

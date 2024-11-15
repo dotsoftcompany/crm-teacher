@@ -53,7 +53,6 @@ function ExamStudentHeader({ student, questions, loading }) {
     );
   }
 
-  console.log(student);
 
   return (
     <div className="space-y-2 pb-4 w-full border-b border-border">
